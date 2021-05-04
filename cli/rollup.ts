@@ -19,12 +19,14 @@ import propertyLookup from "postcss-property-lookup";
 
 import { renderChunk } from "./ssr";
 import { Config } from "./config";
+import { styledPlugin } from "./babel";
 
 export type RollupConfig = InputOptions & {
     output: OutputOptions;
 };
 
 export function makeRollupConfig(config: Config, path: string): RollupConfig {
+    const extractedStyles: string[] = [];
     const stylesheets = new Set<string>();
     const uid = "_" + path.replace(/[^a-z0-9]+/g, "_");
 
@@ -46,6 +48,7 @@ export function makeRollupConfig(config: Config, path: string): RollupConfig {
                 plugins: [
                     "@babel/plugin-proposal-class-properties",
                     "@babel/plugin-proposal-nullish-coalescing-operator",
+                    styledPlugin(uid, extractedStyles),
                 ],
                 presets: [
                     "@babel/preset-typescript",
@@ -118,6 +121,24 @@ export function makeRollupConfig(config: Config, path: string): RollupConfig {
                 generateBundle(options, bundle) {
                     for (const file of Object.values(bundle)) {
                         if (file.type === "chunk" && file.isEntry) {
+                            if (extractedStyles.length > 0) {
+                                this.emitFile({
+                                    type: "asset",
+                                    name: join(
+                                        "styles",
+                                        dirname(path),
+                                        `finnby/${file.name}.css`,
+                                    ),
+                                    source: extractedStyles.join("\n"),
+                                });
+                                stylesheets.add(
+                                    join(
+                                        dirname(path),
+                                        `finnby/${file.name}.css`,
+                                    ),
+                                );
+                            }
+
                             this.emitFile({
                                 type: "asset",
                                 name: join(

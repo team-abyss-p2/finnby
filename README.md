@@ -25,7 +25,7 @@ In an empty directory, create a `package.json` file with this content:
         "watch": "finnby watch"
     },
     "dependencies": {
-        "@team-abyss-p2/finnby": "0.1.0"
+        "@team-abyss-p2/finnby": "0.2.0"
     }
 }
 ```
