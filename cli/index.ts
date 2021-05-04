@@ -33,10 +33,7 @@ async function copyRuntime() {
     await fs.mkdir(common, {
         recursive: true,
     });
-    await fs.copyFile(
-        join(__dirname, "runtime.js"),
-        join(common, "circlevision.js"),
-    );
+    await fs.copyFile(join(__dirname, "runtime.js"), join(common, "finnby.js"));
 }
 
 async function main() {

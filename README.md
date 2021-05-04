@@ -1,4 +1,4 @@
-# Circle-Vision
+# Finnby
 
 React-based Toolkit for writing Panorama UI in the Source engine, inspired by
 Next.js
@@ -18,14 +18,14 @@ In an empty directory, create a `package.json` file with this content:
 
 ```json
 {
-    "name": "my-circlevision-project",
+    "name": "my-finnby-project",
     "version": "1.0.0",
     "scripts": {
-        "build": "circlevision build",
-        "watch": "circlevision watch"
+        "build": "finnby build",
+        "watch": "finnby watch"
     },
     "dependencies": {
-        "@team-abyss-p2/circlevision": "0.1.0"
+        "@team-abyss-p2/finnby": "0.1.0"
     }
 }
 ```
@@ -38,7 +38,7 @@ if you want to use TypeScript):
 
 ```js
 import * as React from "react";
-import { Panel, Label } from "@team-abyss-p2/circlevision";
+import { Panel, Label } from "@team-abyss-p2/finnby";
 
 export default function MyComponent() {
     return (
@@ -49,11 +49,11 @@ export default function MyComponent() {
 }
 ```
 
-If you run `yarn run build` or `npm run build`, Circle-Vision will create a new
-`code` directory in your project containing everything Panorama needs to run
-your new panel. In addition to this generated code, you will need to patch your
-`base_jsregistration.xml` file to load the Circle-Vision runtime for everything
-to work correctly:
+If you run `yarn run build` or `npm run build`, Finnby will create a new `code`
+directory in your project containing everything Panorama needs to run your new
+panel. In addition to this generated code, you will need to patch your
+`base_jsregistration.xml` file to load the Finnby runtime for everything to work
+correctly:
 
 ```xml
 <root>
@@ -61,7 +61,7 @@ to work correctly:
         <include src="file://{resources}/scripts/common/panelregistration.js" />
         <include src="file://{resources}/scripts/common/eventdefinition.js" />
         <!-- Add this line -->
-        <include src="file://{resources}/scripts/common/circlevision.js" />
+        <include src="file://{resources}/scripts/common/finnby.js" />
     </scripts>
     <Panel hittest="false" />
 </root>
@@ -69,8 +69,8 @@ to work correctly:
 
 In a development process, running the build command on every change is
 fastidious so you might want to use `yarn run watch` or `npm run watch` instead:
-it will start the Circle-Vision CLI in watch mode, rebuilding your code
-automatically on every change.
+it will start the Finnby CLI in watch mode, rebuilding your code automatically on
+every change.
 
 Now what if we want our panel to fade in when it get loaded ? In Panorama
 animations use CSS keyframes, so we'll need to create a new CSS file alongside
@@ -100,7 +100,7 @@ Now let's load this style into our component:
 
 ```js
 import * as React from "react";
-import { Panel, Label } from "@team-abyss-p2/circlevision";
+import { Panel, Label } from "@team-abyss-p2/finnby";
 
 import styles from "./mycomponent.css";
 
@@ -138,9 +138,9 @@ reference the `fadeIn` class by name
     reloading get unlocked in the engine this will get switched over to Metro.
 -   Automatically patch the `base_jsregistration.xml` file if it exists in the
     code directory, create it otherwise
--   Setup a `@team-abyss-p2/create-circlevision` package to make bootstrapping a
-    project even easier with `yarn create @team-abyss-p2/circlevision` or
-    `npm create @team-abyss-p2/circlevision`
+-   Setup a `@team-abyss-p2/create-finnby` package to make bootstrapping a
+    project even easier with `yarn create @team-abyss-p2/finnby` or
+    `npm create @team-abyss-p2/finnby`
 -   Automatically create a `tsconfig.json` file in the project directory like
     create-react-app and next.js do if a `.ts` or `.tsx` file is detected to
     make moving to TypeScript easier

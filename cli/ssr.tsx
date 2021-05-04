@@ -34,7 +34,7 @@ function createSandbox(roots: RootComponent[]) {
         UiToolkitAPI: {
             GetGlobalObject: () => ({
                 React,
-                CVRuntime: {
+                FinnbyRuntime: {
                     ...Components,
                     ...Hooks,
                     _mount(Component: RootComponent) {

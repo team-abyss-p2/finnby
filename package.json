@@ -1,13 +1,13 @@
 {
-    "name": "@team-abyss-p2/circlevision",
+    "name": "@team-abyss-p2/finnby",
     "version": "0.1.0",
     "description": "A React framework for Source Panorama",
     "main": "dist/runtime.js",
     "types": "dist/index.d.ts",
     "bin": {
-        "circlevision": "dist/cli.js"
+        "finnby": "dist/cli.js"
     },
-    "repository": "https://github.com/team-abyss-p2/circlevision/",
+    "repository": "https://github.com/team-abyss-p2/finnby/",
     "author": "l3ops <github@leops.me>",
     "license": "MIT",
     "files": [

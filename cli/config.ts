@@ -75,7 +75,7 @@ export function makeRollupConfig(root: string, path: string): RollupConfig {
             }),
             commonjs(),
             {
-                name: "circlevision-postcss",
+                name: "finnby-postcss",
                 async transform(code, id) {
                     if (!id.endsWith(".css")) {
                         return null;
@@ -113,7 +113,7 @@ export function makeRollupConfig(root: string, path: string): RollupConfig {
                 },
             },
             {
-                name: "circlevision-output",
+                name: "finnby-output",
                 generateBundle(options, bundle, isWrite) {
                     for (const file of Object.values(bundle)) {
                         if (file.type === "chunk" && file.isEntry) {
@@ -128,7 +128,7 @@ export function makeRollupConfig(root: string, path: string): RollupConfig {
             },
         ],
 
-        external: ["react", "@team-abyss-p2/circlevision"],
+        external: ["react", "@team-abyss-p2/finnby"],
 
         output: {
             dir: "code/panorama",
@@ -137,12 +137,12 @@ export function makeRollupConfig(root: string, path: string): RollupConfig {
             format: "iife",
 
             name: uid,
-            footer: `UiToolkitAPI.GetGlobalObject().CVRuntime._mount(${uid}, $.GetContextPanel())`,
+            footer: `UiToolkitAPI.GetGlobalObject().FinnbyRuntime._mount(${uid}, $.GetContextPanel())`,
 
             globals: {
                 react: "UiToolkitAPI.GetGlobalObject().React",
-                "@team-abyss-p2/circlevision":
-                    "UiToolkitAPI.GetGlobalObject().CVRuntime",
+                "@team-abyss-p2/finnby":
+                    "UiToolkitAPI.GetGlobalObject().FinnbyRuntime",
             },
         },
     };

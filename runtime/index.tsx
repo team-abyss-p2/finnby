@@ -12,7 +12,7 @@ function noop() {
 
 Object.assign(UiToolkitAPI.GetGlobalObject(), {
     React,
-    CVRuntime: {
+    FinnbyRuntime: {
         ...Components,
         ...Hooks,
         _mount(Component: React.ComponentType, root: Panel) {
