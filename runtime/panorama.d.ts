@@ -1,94 +1,211 @@
 declare class Panel {
+    activationenabled: boolean;
+    readonly actuallayoutheight: number;
+    readonly actuallayoutwidth: number;
+    readonly actualuiscale_x: number;
+    readonly actualuiscale_y: number;
+    readonly actualxoffset: number;
+    readonly actualyoffset: number;
+    checked: boolean;
+    readonly contentheight: number;
+    readonly contentwidth: number;
+    defaultfocus: string;
+    readonly desiredlayoutheight: number;
+    readonly desiredlayoutwidth: number;
+    enabled: boolean;
+    hittest: boolean;
+    hittestchildren: boolean;
+    readonly id: string;
+    inputnamespace: string;
+    readonly layoutfile: string;
     readonly paneltype: string;
+    rememberchildfocus: boolean;
+    readonly scrolloffset_x: number;
+    readonly scrolloffset_y: number;
+    selectionpos_x: number;
+    selectionpos_y: number;
+    readonly style: Record<string, string | number>;
+    tabindex: number;
     visible: boolean;
-    style: Record<string, string>;
 
-    AddClass(image: string): void;
-    RemoveClass(image: string): void;
+    AddClass(className: string): void;
+    ApplyStyles(_: boolean): void;
+    AcceptsFocus(): boolean;
+    AcceptsInput(): boolean;
+    AscendantHasClass(className: string): boolean;
+    CanSeeInParentScroll(): boolean;
+    CreateChildren(_: string): boolean;
     HasClass(className: string): boolean;
-
-    GetParent(): Panel;
-    SetParent(parent: Panel): void;
+    HasDescendantKeyFocus(): boolean;
+    HasHoverStyle(): boolean;
+    HasKeyFocus(): boolean;
+    HasLayoutSnippet(_: string): boolean;
+    IsTransparent(): boolean;
+    LoadLayout(_: string, _: boolean, _: boolean): boolean;
+    LoadLayoutFromString(...args: any[]): void;
+    LoadLayoutSnippet(_: string): boolean;
+    ReadyForDisplay(): boolean;
+    ScrollParentToFitWhenFocused(): boolean;
+    Children(): unknown;
+    ClearPanelEvent(_: string): void;
+    ClearPropertyFromCode(_: unknown): void;
+    CreateCopyOfCSSKeyframes(_: string): unknown;
+    Data(...args: any[]): void;
     DeleteAsync(delay: number): void;
-    RemoveAndDeleteChildren(): void;
-    GetChildIndex(child: Panel): number;
-    GetChildCount(): number;
+    DeleteKeyframes(_: unknown): void;
+    FindChild(_: string): Panel;
+    FindChildInLayoutFile(_: string): Panel;
+    FindChildrenWithClassTraverse(className: string): unknown;
+    FindChildTraverse(_: string): Panel;
+    GetAttributeInt(attribute: string, defaultValue: number): number;
+    GetAttributeString(attribute: string, defaultValue: string): string;
+    GetAttributeUInt32(attribute: string, defaultValue: number): number;
     GetChild(index: number): Panel;
+    GetChildCount(): number;
+    GetChildIndex(child: Panel): number;
+    GetLayoutFileDefine(_: string): string;
+    GetParent(): Panel;
+    GetPositionWithinWindow(): unknown;
+    IsDraggable(): boolean;
+    IsSelected(): boolean;
+    IsSizeValid(): boolean;
+    LoadLayoutAsync(_: string, _: boolean, _: boolean): void;
+    LoadLayoutFromStringAsync(_: string, _: boolean, _: boolean): void;
+    MoveChildAfter(child: Panel, after: Panel): void;
     MoveChildBefore(child: Panel, before: Panel): void;
 
-    GetAttributeInt(key: string, deflt: number): number;
-    GetAttributeString(key: string, deflt: string): string;
-    SetDialogVariable(key: string, value: any): void;
+    RegisterForReadyEvents(_: boolean): void;
+    RemoveAndDeleteChildren(): void;
+    RemoveClass(className: string): void;
+    ScrollParentToMakePanelFit(child: Panel, _: boolean): void;
+    ScrollToBottom(): void;
+    ScrollToFitRegion(
+        _: number,
+        _: number,
+        _: number,
+        _: number,
+        _: unknown,
+        _: boolean,
+        _: boolean,
+    ): void;
+    ScrollToLeftEdge(): void;
+    ScrollToRightEdge(): void;
+    ScrollToTop(): void;
+    SetAcceptsFocus(acceptsFocus: boolean): void;
+    SetAttributeInt(attribute: string, value: number): void;
+    SetAttributeString(attribute: string, value: string): void;
+    SetAttributeUInt32(attribute: string, value: number): void;
+    SetDialogVariable(variable: string, value: any): void;
+    SetDialogVariableInt(variable: string, value: number): void;
+    SetDialogVariableTime(variable: string, value: number): void;
+    SetDisableFocusOnMouseDown(_: boolean): void;
+    SetDraggable(draggable: boolean): void;
+    SetFocus(): boolean;
+    SetHasClass(className: string, hasClass: boolean): void;
+    SetInputNamespace(inputNamespace: string): void;
+    SetPanelEvent(...args: any[]): void;
+    SetParent(parent: Panel): void;
+    SetReadyForDisplay(readyForDisplay: boolean): void;
+    SetScrollParentToFitWhenFocused(
+        scrollParentToFitWhenFocused: boolean,
+    ): void;
+    SetTopOfInputContext(topOfInputContext: boolean): void;
+    SwitchClass(oldClass: string, newClass: string): void;
+    ToggleClass(className: string): void;
+    TriggerClass(className: string): void;
+    UpdateCurrentAnimationKeyframes(_: unknown): void;
+    UpdateFocusInContext(): boolean;
 }
 
 declare class LabelPanel extends Panel {
+    html: boolean;
     text: string;
+
+    SetLocalizationString(loc: string): void;
+    SetProceduralTextThatIPromiseIsLocalizedAndEscaped(
+        text: string,
+        _: boolean,
+    ): void;
 }
+
+type ImageScaling =
+    | "none"
+    | "stretch"
+    | "stretchx"
+    | "stretchy"
+    | "stretch-to-fit-preserve-aspect"
+    | "stretch-to-fit-x-preserve-aspect"
+    | "stretch-to-fit-y-preserve-aspect"
+    | "stretch-to-cover-preserve-aspect";
 
 declare class ImagePanel extends Panel {
     SetImage(image: string): void;
-    SetScaling(image: string): void;
+    SetScaling(image: Panorama.ImageScaling): void;
 }
 
 declare class ProgressBarPanel extends Panel {
     progress: number;
 }
 
-declare class $ {
-    static Msg(...args: any[]): void;
-    static DispatchEvent(event: string, ...args: any[]): void;
-    static RegisterForUnhandledEvent(
+declare function panorama(query: string): Panel;
+
+declare namespace panorama {
+    function Msg(...args: any[]): void;
+    function DispatchEvent(event: string, ...args: any[]): void;
+    function RegisterForUnhandledEvent(
         eventName: string,
         functionHandle: (...args: any[]) => void,
     ): void;
-    static RegisterEventHandler(
-        eventName: string,
-        panel: Panel,
-        functionHandle: (...args: any[]) => void,
-    ): void;
-    static UnregisterEventHandler(
+    function RegisterEventHandler(
         eventName: string,
         panel: Panel,
         functionHandle: (...args: any[]) => void,
     ): void;
-    static UnregisterForUnhandledEvent(
+    function UnregisterEventHandler(
+        eventName: string,
+        panel: Panel,
+        functionHandle: (...args: any[]) => void,
+    ): void;
+    function UnregisterForUnhandledEvent(
         eventName: string,
         functionHandle: (...args: any[]) => void,
     ): void;
-    static GetContextPanel(): Panel;
-    static CreatePanel(type: string, parent: Panel, id: string): Panel;
-    static Schedule(delay: number, func: () => void): void;
-    static CancelScheduled(func: () => void): void;
-    static DefineEvent(
+    function GetContextPanel(): Panel;
+    function CreatePanel(type: string, parent: Panel, id: string): Panel;
+    function Schedule(delay: number, func: () => void): void;
+    function CancelScheduled(func: () => void): void;
+    function DefineEvent(
         event: string,
         argsCount: number,
         argsDoc: string,
         eventDoc: string,
     ): void;
-    static FindChildInContext(query: string): Panel;
-    static Localize(key: string): string;
-    static RegisterKeyBind(panel: Panel, keys: string, cb: () => void): void;
-    static UrlEncode(input: string): string;
-    static UrlDecode(input: string): string;
-    static HTMLEscape(input: string): string;
+    function FindChildInContext(query: string): Panel;
+    function Localize(key: string): string;
+    function RegisterKeyBind(panel: Panel, keys: string, cb: () => void): void;
+    function UrlEncode(input: string): string;
+    function UrlDecode(input: string): string;
+    function HTMLEscape(input: string): string;
 
-    static DefinePanelEvent(): any;
-    static DispatchEventAsync(): any;
-    static AsyncWebRequest(): any;
-    static Language(): any;
-    static Each(): any;
-    static DbgIsReloadingScript(): any;
+    function DefinePanelEvent(): any;
+    function DispatchEventAsync(): any;
+    function AsyncWebRequest(): any;
+    function Language(): any;
+    function Each(): any;
+    function DbgIsReloadingScript(): any;
 }
 
-declare class GameInterfaceAPI {
-    static GetSettingString(settingName: string): string;
-    static SetSettingString(settingName: string, value: string): void;
-    static ConsoleCommand(command: string): void;
+declare const $: typeof panorama;
+
+declare namespace GameInterfaceAPI {
+    function GetSettingString(settingName: string): string;
+    function SetSettingString(settingName: string, value: string): void;
+    function ConsoleCommand(command: string): void;
 }
 
-declare class UiToolkitAPI {
-    static ShowCustomLayoutPopup(popupId: string, layoutFile: string): void;
-    static ShowGenericPopupTwoOptionsBgStyle(
+declare namespace UiToolkitAPI {
+    function ShowCustomLayoutPopup(popupId: string, layoutFile: string): void;
+    function ShowGenericPopupTwoOptionsBgStyle(
         title: string,
         message: string,
         style: string,
@@ -98,83 +215,83 @@ declare class UiToolkitAPI {
         option2Function: () => void,
         bgStyle: string,
     ): void;
-    static AddDenyAllInputToGame(
+    function AddDenyAllInputToGame(
         panel: Panel,
         debugContextName: string,
         whatInput: string,
     ): number;
-    static ReleaseDenyAllInputToGame(handle: number): void;
-    static AddDenyMouseInputToGame(
+    function ReleaseDenyAllInputToGame(handle: number): void;
+    function AddDenyMouseInputToGame(
         panel: Panel,
         debugContextName: string,
         whatInput: string,
     ): number;
-    static ReleaseDenyMouseInputToGame(handle: number): void;
-    static ShowGenericPopup(
+    function ReleaseDenyMouseInputToGame(handle: number): void;
+    function ShowGenericPopup(
         title: string,
         message: string,
         style: string,
     ): void;
-    static ShowGlobalCustomLayoutPopup(id: string, layout: string): void;
-    static CloseAllVisiblePopups(): void;
-    static RegisterJSCallback(cb: (...args: any[]) => any): number;
-    static InvokeJSCallback(cb: number, ...args: any[]): any;
-    static UnregisterJSCallback(cb: number): void;
-    static ShowGenericPopupOk(
+    function ShowGlobalCustomLayoutPopup(id: string, layout: string): void;
+    function CloseAllVisiblePopups(): void;
+    function RegisterJSCallback(cb: (...args: any[]) => any): number;
+    function InvokeJSCallback(cb: number, ...args: any[]): any;
+    function UnregisterJSCallback(cb: number): void;
+    function ShowGenericPopupOk(
         title: string,
         message: string,
         style: string,
         ok: () => void,
         cancel: () => void,
     ): void;
-    static ShowGenericPopupCancel(
+    function ShowGenericPopupCancel(
         title: string,
         message: string,
         style: string,
         cancel: () => void,
     ): void;
-    static GetGlobalObject(): any;
-    static RegisterPanel2d(panel: string, layout: string): void;
-    static ProfilingScopeBegin(scope: string): void;
-    static ProfilingScopeEnd(): number;
-    static MakeStringSafe(input: string): string;
-    static IsPanoramaInECOMode(): bool;
+    function GetGlobalObject(): any;
+    function RegisterPanel2d(panel: string, layout: string): void;
+    function ProfilingScopeBegin(scope: string): void;
+    function ProfilingScopeEnd(): number;
+    function MakeStringSafe(input: string): string;
+    function IsPanoramaInECOMode(): bool;
 
-    static ShowGenericPopupYesNo(): any;
-    static ShowGenericPopupOkCancel(): any;
-    static ShowGenericPopupYesNoCancel(): any;
-    static ShowGenericPopupOneOption(): any;
-    static ShowGenericPopupTwoOptions(): any;
-    static ShowGenericPopupThreeOptions(): any;
-    static ShowGenericPopupBgStyle(): any;
-    static ShowGenericPopupOkBgStyle(): any;
-    static ShowGenericPopupCancelBgStyle(): any;
-    static ShowGenericPopupYesNoBgStyle(): any;
-    static ShowGenericPopupOkCancelBgStyle(): any;
-    static ShowGenericPopupYesNoCancelBgStyle(): any;
-    static ShowGenericPopupOneOptionBgStyle(): any;
-    static ShowGenericPopupThreeOptionsBgStyle(): any;
-    static ShowCustomLayoutPopupParameters(): any;
-    static ShowGlobalCustomLayoutPopupParameters(): any;
-    static ShowTextTooltip(): any;
-    static ShowTextTooltipOnPanel(): any;
-    static ShowTextTooltipStyled(): any;
-    static ShowTextTooltipOnPanelStyled(): any;
-    static HideTextTooltip(): any;
-    static ShowTitleTextTooltip(): any;
-    static ShowTitleTextTooltipStyled(): any;
-    static HideTitleTextTooltip(): any;
-    static ShowTitleImageTextTooltip(): any;
-    static ShowTitleImageTextTooltipStyled(): any;
-    static HideTitleImageTextTooltip(): any;
-    static ShowCustomLayoutParametersTooltip(): any;
-    static ShowCustomLayoutParametersTooltipStyled(): any;
-    static ShowCustomLayoutTooltip(): any;
-    static ShowCustomLayoutTooltipStyled(): any;
-    static HideCustomLayoutTooltip(): any;
-    static ShowSimpleContextMenu(): any;
-    static ShowSimpleContextMenuWithDismissEvent(): any;
-    static ShowCustomLayoutContextMenu(): any;
-    static ShowCustomLayoutContextMenuParameters(): any;
-    static ShowCustomLayoutContextMenuParametersDismissEvent(): any;
+    function ShowGenericPopupYesNo(): any;
+    function ShowGenericPopupOkCancel(): any;
+    function ShowGenericPopupYesNoCancel(): any;
+    function ShowGenericPopupOneOption(): any;
+    function ShowGenericPopupTwoOptions(): any;
+    function ShowGenericPopupThreeOptions(): any;
+    function ShowGenericPopupBgStyle(): any;
+    function ShowGenericPopupOkBgStyle(): any;
+    function ShowGenericPopupCancelBgStyle(): any;
+    function ShowGenericPopupYesNoBgStyle(): any;
+    function ShowGenericPopupOkCancelBgStyle(): any;
+    function ShowGenericPopupYesNoCancelBgStyle(): any;
+    function ShowGenericPopupOneOptionBgStyle(): any;
+    function ShowGenericPopupThreeOptionsBgStyle(): any;
+    function ShowCustomLayoutPopupParameters(): any;
+    function ShowGlobalCustomLayoutPopupParameters(): any;
+    function ShowTextTooltip(): any;
+    function ShowTextTooltipOnPanel(): any;
+    function ShowTextTooltipStyled(): any;
+    function ShowTextTooltipOnPanelStyled(): any;
+    function HideTextTooltip(): any;
+    function ShowTitleTextTooltip(): any;
+    function ShowTitleTextTooltipStyled(): any;
+    function HideTitleTextTooltip(): any;
+    function ShowTitleImageTextTooltip(): any;
+    function ShowTitleImageTextTooltipStyled(): any;
+    function HideTitleImageTextTooltip(): any;
+    function ShowCustomLayoutParametersTooltip(): any;
+    function ShowCustomLayoutParametersTooltipStyled(): any;
+    function ShowCustomLayoutTooltip(): any;
+    function ShowCustomLayoutTooltipStyled(): any;
+    function HideCustomLayoutTooltip(): any;
+    function ShowSimpleContextMenu(): any;
+    function ShowSimpleContextMenuWithDismissEvent(): any;
+    function ShowCustomLayoutContextMenu(): any;
+    function ShowCustomLayoutContextMenuParameters(): any;
+    function ShowCustomLayoutContextMenuParametersDismissEvent(): any;
 }

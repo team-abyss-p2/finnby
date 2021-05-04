@@ -6,6 +6,7 @@ import { babel, getBabelOutputPlugin } from "@rollup/plugin-babel";
 import { nodeResolve } from "@rollup/plugin-node-resolve";
 import commonjs from "@rollup/plugin-commonjs";
 import typescript from "@rollup/plugin-typescript";
+import json from "@rollup/plugin-json";
 
 const RUNTIME_CONFIG = {
     input: "runtime/index.tsx",
@@ -14,12 +15,18 @@ const RUNTIME_CONFIG = {
             "process.env.NODE_ENV": JSON.stringify("production"),
             preventAssignment: true,
         }),
+        // Emotion needs to import JSON files for CSS parsing
+        json(),
+        // Resolve dependencies from node_modules
+        nodeResolve({ browser: false }),
+        commonjs(),
         // Use the TypeScript plugin to generate declarations
         typescript({
             declaration: true,
             declarationDir: "dist",
             rootDir: "runtime",
             exclude: "cli/**",
+            resolveJsonModule: true,
         }),
         // Run Babel on the output to ensure compatibility with the V8
         // version embedded in P2CE (5.8.283 on 04/03/2021)
@@ -38,13 +45,6 @@ const RUNTIME_CONFIG = {
                 ],
             ],
         }),
-        // Resolve dependencies from node_modules, using a whitelist
-        // to prevent accidentally including stuff into the runtime bundle
-        nodeResolve({
-            browser: false,
-            resolveOnly: ["react", "react-reconciler"],
-        }),
-        commonjs(),
     ],
 
     output: {
@@ -84,7 +84,12 @@ const CLI_CONFIG = {
 
             babelHelpers: "bundled",
             extensions: [".ts", ".tsx", ".js", ".jsx"],
-            include: ["cli/**", "runtime/components.ts", "runtime/hooks.ts"],
+            include: [
+                "cli/**",
+                "runtime/components.ts",
+                "runtime/hooks.ts",
+                "runtime/styled/*",
+            ],
             exclude: /node_modules/,
         }),
         // This is only here so Rollup will resolve .ts files, the empty
@@ -102,10 +107,12 @@ const CLI_CONFIG = {
         "path",
         "cosmiconfig",
         "rollup",
+        "@babel/core",
         "@rollup/plugin-replace",
         "@rollup/plugin-babel",
         "@rollup/plugin-node-resolve",
         "@rollup/plugin-commonjs",
+        "css-to-react-native",
         "postcss",
         "postcss-modules",
         "postcss-advanced-variables",

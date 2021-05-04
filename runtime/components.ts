@@ -28,15 +28,77 @@ declare namespace Panorama {
     }
 
     export interface PanelProps<T = Panel> extends BaseProps {
-        key?: string;
         ref?: React.Ref<T>;
-        children?: React.ReactNode;
 
         id?: string;
         class?: string;
+        style?: Record<string, string | number>;
+
+        activationenabled?: boolean;
+        checked?: boolean;
+        defaultfocus?: string;
+        enabled?: boolean;
         hittest?: boolean;
         hittestchildren?: boolean;
-        style?: Record<string, string | number>;
+        inputnamespace?: string;
+        rememberchildfocus?: boolean;
+        selectionpos_x?: number;
+        selectionpos_y?: number;
+        tabindex?: number;
+        visible?: boolean;
+
+        onAddStyle?(): void;
+        onRemoveStyle?(): void;
+        onToggleStyle?(): void;
+        onAddStyleToEachChild?(): void;
+        onRemoveStyleFromEachChild?(): void;
+        onPanelLoaded?(): void;
+        onCheckChildrenScrolledIntoView?(): void;
+        onScrollPanelIntoView?(): void;
+        onScrolledIntoView?(): void;
+        onScrolledOutOfView?(): void;
+        onLoadLayoutFileAsync?(): void;
+        onAppendChildrenFromLayoutFileAsync?(): void;
+        onLoadLayoutFromXMLStringAsync?(): void;
+        onLoadLayoutFromBase64XMLStringAsync?(): void;
+        onActivated?(): void;
+        onCancelled?(): void;
+        onContextMenu?(): void;
+        onLocalizationChanged?(): void;
+        onInputFocusSet?(): void;
+        onInputFocusLost?(): void;
+        onSetInputFocus?(): void;
+        onShowTooltip?(): void;
+        onStyleFlagsChanged?(): void;
+        onStyleClassesChanged?(): void;
+        onPanelStyleChanged?(): void;
+        onAnimationStart?(): void;
+        onAnimationEnd?(): void;
+        onPropertyTransitionEnd?(): void;
+        onCopyStringToClipboard?(): void;
+        onSetAllChildrenActivationEnabled?(): void;
+        onSetPanelEvent?(): void;
+        onClearPanelEvent?(): void;
+        onIfHasClassEvent?(): void;
+        onIfNotHasClassEvent?(): void;
+        onIfHoverOtherEvent?(): void;
+        onIfNotHoverOtherEvent?(): void;
+        onScrollToTop?(): void;
+        onScrollToBottom?(): void;
+        onLoadAsyncComplete?(): void;
+        onSetPanelSelected?(): void;
+        onResetToDefaultValue?(): void;
+        onTogglePanelSelected?(): void;
+        onSetChildPanelsSelected?(): void;
+        onScrollPanelLeft?(): void;
+        onScrollPanelRight?(): void;
+        onScrollPanelUp?(): void;
+        onScrollPanelDown?(): void;
+        onPagePanelLeft?(): void;
+        onPagePanelRight?(): void;
+        onPagePanelUp?(): void;
+        onPagePanelDown?(): void;
+        onDropdownMenuFocusChanged?(): void;
     }
 
     export type ImageScaling =

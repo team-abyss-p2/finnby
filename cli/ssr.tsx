@@ -3,6 +3,7 @@ import { runInNewContext } from "vm";
 import * as React from "react";
 import type { OutputChunk } from "rollup";
 
+import styled, { css } from "./styled";
 import * as Components from "../runtime/components";
 import * as Hooks from "../runtime/hooks";
 
@@ -42,6 +43,8 @@ function createSandbox(roots: RootComponent[]) {
             GetGlobalObject: () => ({
                 React,
                 FinnbyRuntime: {
+                    css,
+                    styled,
                     ...Components,
                     ...Hooks,
                     _mount(Component: RootComponent) {
