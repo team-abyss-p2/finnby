@@ -7,6 +7,12 @@
     "bin": {
         "finnby": "dist/cli.js"
     },
+    "scripts": {
+        "typecheck": "tsc --noEmit",
+        "stylecheck": "prettier --check {cli,runtime}/**/*.{ts,tsx,js}",
+        "lint": "eslint . --ext .js,.jsx,.ts,.tsx",
+        "test": "yarn typecheck && yarn lint && yarn stylecheck"
+    },
     "repository": "https://github.com/team-abyss-p2/finnby/",
     "author": "l3ops <github@leops.me>",
     "license": "MIT",
@@ -26,9 +32,14 @@
         "@types/react": "^17.0.2",
         "@types/react-dom": "^17.0.1",
         "@types/react-reconciler": "^0.26.0",
+        "@typescript-eslint/eslint-plugin": "^4.22.1",
+        "@typescript-eslint/parser": "^4.22.1",
+        "eslint": "^7.25.0",
+        "eslint-config-prettier": "^8.3.0",
+        "prettier": "^2.2.1",
         "react-reconciler": "^0.26.1",
         "tslib": "^2.1.0",
-        "typescript": "^4.2.2"
+        "typescript": "^4.2.4"
     },
     "dependencies": {
         "@babel/core": "^7.13.8",

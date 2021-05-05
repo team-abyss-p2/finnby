@@ -1,8 +1,10 @@
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 function setTimeout(func, delay) {
     $.Schedule(delay, func);
     return func;
 }
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 function clearTimeout(id) {
     $.CancelScheduled(id);
 }

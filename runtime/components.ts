@@ -57,6 +57,7 @@ declare namespace Panorama {
         text?: string;
     }
 
+    // eslint-disable-next-line @typescript-eslint/no-empty-interface
     export interface ProgressBarProps extends PanelProps<ProgressBarPanel> {}
 
     export interface ChaosMainMenuProps extends PanelProps {

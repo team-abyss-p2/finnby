@@ -114,7 +114,7 @@ export function makeRollupConfig(root: string, path: string): RollupConfig {
             },
             {
                 name: "finnby-output",
-                generateBundle(options, bundle, isWrite) {
+                generateBundle(options, bundle) {
                     for (const file of Object.values(bundle)) {
                         if (file.type === "chunk" && file.isEntry) {
                             this.emitFile({

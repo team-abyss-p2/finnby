@@ -5,7 +5,7 @@ declare class Panel {
 
     AddClass(image: string): void;
     RemoveClass(image: string): void;
-    BHasClass(className: string): boolean;
+    HasClass(className: string): boolean;
 
     GetParent(): Panel;
     SetParent(parent: Panel): void;

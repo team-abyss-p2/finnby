@@ -6,9 +6,12 @@ import type { OutputChunk } from "rollup";
 import * as Components from "../runtime/components";
 import * as Hooks from "../runtime/hooks";
 
+// Temporarily override NODE_ENV to "production" when requiring
+// react-dom/server to load the production bundle for SSR
 const prevEnv = process.env.NODE_ENV;
 process.env.NODE_ENV = "production";
 
+// eslint-disable-next-line @typescript-eslint/no-var-requires
 const server = require("react-dom/server") as typeof import("react-dom/server");
 
 process.env.NODE_ENV = prevEnv;
@@ -25,7 +28,9 @@ function createSandbox(roots: RootComponent[]) {
 
     const CONTEXT_PANEL = Symbol("contextPanel");
     panorama["GetContextPanel"] = () => CONTEXT_PANEL;
-    panorama["Msg"] = () => {};
+    panorama["Msg"] = () => {
+        // noop
+    };
 
     return {
         panorama,
@@ -53,7 +58,10 @@ function renderElement(elem: React.ReactElement) {
         .replace(/style="([^"]+)"/g, `style="$1;"`);
 }
 
-export function renderChunk(file: OutputChunk, stylesheets: Set<string>) {
+export function renderChunk(
+    file: OutputChunk,
+    stylesheets: Set<string>,
+): string {
     const roots: RootComponent[] = [];
 
     runInNewContext(file.code, createSandbox(roots), {

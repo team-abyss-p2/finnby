@@ -217,7 +217,7 @@ const CONFIG: Config = {
     supportsMutation: true,
     supportsPersistence: false,
 
-    createInstance(type, props, rootContainer, hostContext, internalHandle) {
+    createInstance(type, props) {
         const instance = $.CreatePanel(
             type,
             $.GetContextPanel(),
@@ -228,7 +228,7 @@ const CONFIG: Config = {
         return instance;
     },
 
-    createTextInstance(text, rootContainer, hostContext, internalHandle) {
+    createTextInstance() {
         throw new Error("Text nodes are not supported");
     },
 
@@ -236,31 +236,24 @@ const CONFIG: Config = {
         child.SetParent(parentInstance);
     },
 
-    finalizeInitialChildren(instance, type, props, rootContainer, hostContext) {
+    finalizeInitialChildren() {
         return false;
     },
 
-    prepareUpdate(
-        instance,
-        type,
-        oldProps,
-        newProps,
-        rootContainer,
-        hostContext,
-    ) {
+    prepareUpdate(instance, type, oldProps, newProps) {
         const diff = computeDiff(oldProps, newProps);
         return diff.length > 0 ? diff : null;
     },
 
-    shouldSetTextContent(type, props) {
+    shouldSetTextContent(type) {
         return type === "Label";
     },
 
-    getRootHostContext(rootContainer) {
+    getRootHostContext() {
         return null;
     },
 
-    getChildHostContext(parentHostContext, type, rootContainer) {
+    getChildHostContext(parentHostContext) {
         return parentHostContext;
     },
 
@@ -268,13 +261,17 @@ const CONFIG: Config = {
         return instance;
     },
 
-    prepareForCommit(containerInfo) {
+    prepareForCommit() {
         return null;
     },
 
-    resetAfterCommit(containerInfo) {},
+    resetAfterCommit() {
+        // noop
+    },
 
-    preparePortalMount(containerInfo) {},
+    preparePortalMount() {
+        // noop
+    },
 
     now: Date.now,
     scheduleTimeout(fn, delay) {
@@ -331,16 +328,11 @@ const CONFIG: Config = {
         textInstance.text = newText;
     },
 
-    commitMount(instance, type, props, internalInstanceHandle) {},
+    commitMount() {
+        // noop
+    },
 
-    commitUpdate(
-        instance,
-        updatePayload,
-        type,
-        prevProps,
-        nextProps,
-        internalHandle,
-    ) {
+    commitUpdate(instance, updatePayload) {
         if (Array.isArray(updatePayload)) {
             applyPropList(instance, updatePayload);
         } else {
@@ -374,27 +366,27 @@ const CONFIG: Config = {
 
     supportsHydration: true,
 
-    canHydrateInstance(instance, type, props) {
+    canHydrateInstance(instance) {
         return instance;
     },
 
-    canHydrateTextInstance(instance, text) {
+    canHydrateTextInstance() {
         throw new Error("Not implemented canHydrateTextInstance");
     },
 
-    canHydrateSuspenseInstance(instance) {
+    canHydrateSuspenseInstance() {
         throw new Error("Not implemented canHydrateSuspenseInstance");
     },
 
-    isSuspenseInstancePending(instance) {
+    isSuspenseInstancePending() {
         throw new Error("Not implemented isSuspenseInstancePending");
     },
 
-    isSuspenseInstanceFallback(instance) {
+    isSuspenseInstanceFallback() {
         throw new Error("Not implemented isSuspenseInstanceFallback");
     },
 
-    registerSuspenseInstanceRetry(instance, callback) {
+    registerSuspenseInstanceRetry() {
         throw new Error("Not implemented registerSuspenseInstanceRetry");
     },
 
@@ -424,61 +416,46 @@ const CONFIG: Config = {
         return parentInstance.GetChild(0);
     },
 
-    hydrateInstance(
-        instance,
-        type,
-        props,
-        rootContainerInstance,
-        hostContext,
-        internalInstanceHandle,
-    ) {
+    hydrateInstance(instance, type, props) {
         const diff = computeDiff(HYDRATION, props);
         return diff.length > 0 ? diff : null;
     },
 
-    hydrateTextInstance(textInstance, text, internalInstanceHandle) {
+    hydrateTextInstance() {
         throw new Error("Not implemented hydrateTextInstance");
     },
 
-    hydrateSuspenseInstance(suspenseInstance, internalInstanceHandle) {
+    hydrateSuspenseInstance() {
         throw new Error("Not implemented hydrateSuspenseInstance");
     },
 
-    getNextHydratableInstanceAfterSuspenseInstance(suspenseInstance) {
+    getNextHydratableInstanceAfterSuspenseInstance() {
         throw new Error(
             "Not implemented getNextHydratableInstanceAfterSuspenseInstance",
         );
     },
 
-    getParentSuspenseInstance(targetInstance) {
+    getParentSuspenseInstance() {
         throw new Error("Not implemented getParentSuspenseInstance");
     },
 
-    commitHydratedContainer(container) {},
+    commitHydratedContainer() {
+        // noop
+    },
 
-    commitHydratedSuspenseInstance(suspenseInstance) {
+    commitHydratedSuspenseInstance() {
         throw new Error("Not implemented commitHydratedSuspenseInstance");
     },
 
-    didNotMatchHydratedContainerTextInstance(
-        parentContainer,
-        textInstance,
-        text,
-    ) {
+    didNotMatchHydratedContainerTextInstance() {
         $.Msg("didNotMatchHydratedContainerTextInstance");
     },
 
-    didNotMatchHydratedTextInstance(
-        parentType,
-        parentProps,
-        parentInstance,
-        textInstance,
-        text,
-    ) {
+    didNotMatchHydratedTextInstance() {
         $.Msg("didNotMatchHydratedTextInstance");
     },
 
-    didNotHydrateContainerInstance(parentContainer, instance) {
+    didNotHydrateContainerInstance() {
         $.Msg("didNotHydrateContainerInstance");
     },
 
@@ -486,42 +463,27 @@ const CONFIG: Config = {
         $.Msg("Unexpected " + instance.paneltype + " in " + parentType);
     },
 
-    didNotFindHydratableContainerInstance(parentContainer, type, props) {
+    didNotFindHydratableContainerInstance() {
         $.Msg("didNotFindHydratableContainerInstance");
     },
 
-    didNotFindHydratableContainerTextInstance(parentContainer, text) {
+    didNotFindHydratableContainerTextInstance() {
         $.Msg("didNotFindHydratableContainerTextInstance");
     },
 
-    didNotFindHydratableContainerSuspenseInstance(parentContainer) {
+    didNotFindHydratableContainerSuspenseInstance() {
         $.Msg("didNotFindHydratableContainerSuspenseInstance");
     },
 
-    didNotFindHydratableInstance(
-        parentType,
-        parentProps,
-        parentInstance,
-        type,
-        props,
-    ) {
+    didNotFindHydratableInstance() {
         $.Msg("didNotFindHydratableInstance");
     },
 
-    didNotFindHydratableTextInstance(
-        parentType,
-        parentProps,
-        parentInstance,
-        text,
-    ) {
+    didNotFindHydratableTextInstance() {
         $.Msg("didNotFindHydratableTextInstance");
     },
 
-    didNotFindHydratableSuspenseInstance(
-        parentType,
-        parentProps,
-        parentInstance,
-    ) {
+    didNotFindHydratableSuspenseInstance() {
         $.Msg("didNotFindHydratableSuspenseInstance");
     },
 };

@@ -1,4 +1,4 @@
-/// <reference path="./panorama.d.ts" />
+import "./panorama";
 
 import * as React from "react";
 

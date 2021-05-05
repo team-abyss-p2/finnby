@@ -4,7 +4,7 @@ export function useUnhandledEvent(
     name: string,
     handler: () => void,
     deps: any[],
-) {
+): void {
     useEffect(() => {
         $.RegisterForUnhandledEvent(name, handler);
         return () => {
@@ -18,7 +18,7 @@ export function usePanelEvent(
     panel: Panel,
     handler: () => void,
     deps: any[],
-) {
+): void {
     useEffect(() => {
         $.RegisterEventHandler(name, panel, handler);
         return () => {
