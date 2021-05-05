@@ -61,6 +61,6 @@
         "postcss-property-lookup": "^2.0.0",
         "react": "^17.0.1",
         "react-dom": "^17.0.1",
-        "rollup": "^2.40.0"
+        "rollup": "^2.47.0"
     }
 }
