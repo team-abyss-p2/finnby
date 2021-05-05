@@ -11,9 +11,7 @@ const RUNTIME_CONFIG = {
     input: "runtime/index.tsx",
     plugins: [
         replace({
-            "process.env.NODE_ENV": JSON.stringify(
-                process.env.NODE_ENV || "development",
-            ),
+            "process.env.NODE_ENV": JSON.stringify("production"),
             preventAssignment: true,
         }),
         // Use the TypeScript plugin to generate declarations
@@ -102,6 +100,7 @@ const CLI_CONFIG = {
         "fs",
         "vm",
         "path",
+        "cosmiconfig",
         "rollup",
         "@rollup/plugin-replace",
         "@rollup/plugin-babel",

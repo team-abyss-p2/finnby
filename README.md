@@ -69,8 +69,8 @@ correctly:
 
 In a development process, running the build command on every change is
 fastidious so you might want to use `yarn run watch` or `npm run watch` instead:
-it will start the Finnby CLI in watch mode, rebuilding your code automatically on
-every change.
+it will start the Finnby CLI in watch mode, rebuilding your code automatically
+on every change.
 
 Now what if we want our panel to fade in when it get loaded ? In Panorama
 animations use CSS keyframes, so we'll need to create a new CSS file alongside
@@ -116,13 +116,33 @@ export default function MyComponent() {
 Thanks to CSS modules, we can simply import the CSS file in JavaScript and
 reference the `fadeIn` class by name
 
+## Configuration
+
+If you need more control on how the Finnby toolchain is configured, you can
+create a `finnby.config.js` file at the root of your workspace that supports the
+following options:
+
+```js
+module.exports = {
+    // Directory used to search for panel files
+    componentsDir: path.join(process.pwd(), "components"),
+    // Output directory for the compiled panels
+    outDir: path.join(process.pwd(), "code/panorama"),
+    // This function is passed the list of PostCSS plugins
+    // used to build the stylesheet files and can be used
+    // to add more as needed
+    postcss: (plugins) => plugins,
+    // This hook is passed the Rollup configuration used
+    // internally to build the panel bundles, and allows
+    // for fine configuration of the bundling options
+    rollup: (config) => config,
+};
+```
+
 ## Known limitations / Planned features
 
 -   Watch mode doesn't detect new components yet, the CLI needs to be restarted
     to pickup new files
--   The toolchain isn't entirely configurable, more Babel plugins / presets can
-    be added using a `babel.config.js` file, but that's not possible for Rollup
-    and PostCSS
 -   More / better TypeScript declarations: right now the ones included are
     extremely barebone
 -   Support for styled-components would be nice as that model fits better with
@@ -130,9 +150,6 @@ reference the `fadeIn` class by name
     expose a way to declare new stylesheets at runtime they will need to rely on
     a babel transform to extract the static parts ahead of time and use inline
     styles for everything else. It's possible but hasn't been tested yet.
--   The CLI does not automatically pack the code directory into a pbin archive
-    (the code to do this is written but not published yet as it requires
-    panorama.dll to be patched with the key used to sign the archive)
 -   The CLI is using Rollup as a bundler for simplicity since it's also what's
     used to package the CLI and runtime, but if the capabilities needed for hot
     reloading get unlocked in the engine this will get switched over to Metro.

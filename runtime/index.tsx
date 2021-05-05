@@ -1,4 +1,5 @@
-import "./panorama";
+// eslint-disable-next-line @typescript-eslint/triple-slash-reference
+/// <reference path="./panorama.d.ts" />
 
 import * as React from "react";
 

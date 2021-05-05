@@ -1,149 +1,45 @@
-import { join, relative } from "path";
+import { join } from "path";
+import { cosmiconfig } from "cosmiconfig";
+import { RollupConfig } from "./rollup";
+import { AcceptedPlugin } from "postcss";
 
-import type { InputOptions, OutputOptions } from "rollup";
-import replace from "@rollup/plugin-replace";
-import { babel } from "@rollup/plugin-babel";
-import { nodeResolve } from "@rollup/plugin-node-resolve";
-import commonjs from "@rollup/plugin-commonjs";
+export interface Config {
+    // Base directory used to search for panel files
+    componentsDir: string;
+    // Output directory for the compiled panels
+    outDir: string;
+    // Customization hook to modify the list of
+    // PostCSS plugins used to build the stylesheet files
+    postcss(config: AcceptedPlugin[]): AcceptedPlugin[];
+    // Customization hook to modify the Rollup configuration
+    // used internally to build the panels
+    rollup(config: RollupConfig): RollupConfig;
+}
 
-import postcss from "postcss";
-// @ts-expect-error missing types
-import modules from "postcss-modules";
-// @ts-expect-error missing types
-import advancedVariables from "postcss-advanced-variables";
-// @ts-expect-error missing types
-import atroot from "postcss-atroot";
-// @ts-expect-error missing types
-import extendRule from "postcss-extend-rule";
-import nested from "postcss-nested";
-// @ts-expect-error missing types
-import propertyLookup from "postcss-property-lookup";
+async function load(): Promise<Partial<Config>> {
+    const explorer = cosmiconfig("finnby");
 
-import { renderChunk } from "./ssr";
+    try {
+        const result = await explorer.search();
+        if (result == null) {
+            return {};
+        }
 
-export type RollupConfig = InputOptions & {
-    output: OutputOptions;
-};
+        return typeof result.config === "object" ? result.config : {};
+    } catch (err) {
+        console.warn(err);
+        return {};
+    }
+}
 
-export function makeRollupConfig(root: string, path: string): RollupConfig {
-    const stylesheets = new Set<string>();
-    const uid = "_" + path.replace(/[^a-z0-9]+/g, "_");
+export async function loadConfig(): Promise<Config> {
+    const config = await load();
 
     return {
-        input: join("components", path),
-
-        plugins: [
-            replace({
-                "process.env.NODE_ENV": JSON.stringify(
-                    process.env.NODE_ENV || "development",
-                ),
-                preventAssignment: true,
-            }),
-            babel({
-                babelHelpers: "bundled",
-                extensions: [".js", ".jsx", ".ts", ".tsx"],
-                exclude: /node_modules/,
-
-                plugins: [
-                    "@babel/plugin-proposal-class-properties",
-                    "@babel/plugin-proposal-nullish-coalescing-operator",
-                ],
-                presets: [
-                    "@babel/preset-typescript",
-                    [
-                        "@babel/preset-react",
-                        {
-                            // Force the classic runtime since react
-                            // cannot be auto-required from JS files
-                            runtime: "classic",
-                        },
-                    ],
-                    [
-                        "@babel/preset-env",
-                        {
-                            modules: false,
-                            targets: {
-                                node: "8.0.0", // P2CE V8 Version: 5.8.283
-                            },
-                        },
-                    ],
-                ],
-            }),
-            nodeResolve({
-                resolveOnly: ["classnames"],
-                browser: false,
-            }),
-            commonjs(),
-            {
-                name: "finnby-postcss",
-                async transform(code, id) {
-                    if (!id.endsWith(".css")) {
-                        return null;
-                    }
-
-                    let result: any;
-
-                    const processor = postcss([
-                        modules({
-                            getJSON: (_: any, json: any) => {
-                                result = json;
-                            },
-                        }),
-                        advancedVariables(),
-                        atroot(),
-                        extendRule(),
-                        nested(),
-                        propertyLookup(),
-                    ]);
-
-                    const { css } = await processor.process(code, { from: id });
-
-                    const fileName = relative(root, id);
-                    stylesheets.add(fileName);
-
-                    this.emitFile({
-                        type: "asset",
-                        name: `styles/${fileName}`,
-                        source: css,
-                    });
-
-                    return {
-                        code: `export default ${JSON.stringify(result)};`,
-                    };
-                },
-            },
-            {
-                name: "finnby-output",
-                generateBundle(options, bundle) {
-                    for (const file of Object.values(bundle)) {
-                        if (file.type === "chunk" && file.isEntry) {
-                            this.emitFile({
-                                type: "asset",
-                                name: `layout/${file.name}.xml`,
-                                source: renderChunk(file, stylesheets),
-                            });
-                        }
-                    }
-                },
-            },
-        ],
-
-        external: ["react", "@team-abyss-p2/finnby"],
-
-        output: {
-            dir: "code/panorama",
-            assetFileNames: "[name][extname]",
-            entryFileNames: "scripts/components/[name].js",
-            format: "iife",
-
-            name: uid,
-            footer: `UiToolkitAPI.GetGlobalObject().FinnbyRuntime._mount(${uid}, $.GetContextPanel())`,
-
-            globals: {
-                react: "UiToolkitAPI.GetGlobalObject().React",
-                "@team-abyss-p2/finnby":
-                    "UiToolkitAPI.GetGlobalObject().FinnbyRuntime",
-            },
-        },
+        componentsDir: join(process.cwd(), "components"),
+        outDir: join(process.cwd(), "code/panorama"),
+        postcss: (plugins) => plugins,
+        rollup: (config) => config,
+        ...config,
     };
 }

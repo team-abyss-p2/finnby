@@ -2,20 +2,23 @@ import { join, extname } from "path";
 import { promises as fs } from "fs";
 import { watch, rollup } from "rollup";
 
-import { makeRollupConfig, RollupConfig } from "./config";
+import { makeRollupConfig, RollupConfig } from "./rollup";
+import { Config, loadConfig } from "./config";
 
 const SUPPORTED = [".tsx", ".ts", ".jsx", ".js"];
 
 async function traverseComponents(
     configs: RollupConfig[],
-    root: string,
+    config: Config,
     dir: string,
 ) {
-    const list = await fs.readdir(join(root, dir), { withFileTypes: true });
+    const list = await fs.readdir(join(config.componentsDir, dir), {
+        withFileTypes: true,
+    });
 
     for (const entry of list) {
         if (entry.isDirectory()) {
-            await traverseComponents(configs, root, join(dir, entry.name));
+            await traverseComponents(configs, config, join(dir, entry.name));
         }
 
         if (entry.isFile()) {
@@ -23,13 +26,13 @@ async function traverseComponents(
                 continue;
             }
 
-            configs.push(makeRollupConfig(root, join(dir, entry.name)));
+            configs.push(makeRollupConfig(config, join(dir, entry.name)));
         }
     }
 }
 
-async function copyRuntime() {
-    const common = join(process.cwd(), "code/panorama/scripts/common");
+async function copyRuntime(config: Config) {
+    const common = join(config.outDir, "scripts/common");
     await fs.mkdir(common, {
         recursive: true,
     });
@@ -37,22 +40,22 @@ async function copyRuntime() {
 }
 
 async function main() {
-    const dir = process.cwd();
+    const config = await loadConfig();
 
-    const configs: RollupConfig[] = [];
-    await traverseComponents(configs, join(dir, "components"), ".");
+    const rollupConfigs: RollupConfig[] = [];
+    await traverseComponents(rollupConfigs, config, ".");
 
-    await copyRuntime();
+    await copyRuntime(config);
 
     const [, , command] = process.argv;
     switch (command) {
         case "watch":
-            watch(configs);
+            watch(rollupConfigs);
             break;
 
         case "build":
             await Promise.all(
-                configs.map(async (config) => {
+                rollupConfigs.map(async (config) => {
                     const build = await rollup(config);
                     await build.write(config.output);
                 }),
