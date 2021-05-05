@@ -38,7 +38,7 @@
         "eslint": "^7.25.0",
         "eslint-config-prettier": "^8.3.0",
         "prettier": "^2.2.1",
-        "react-reconciler": "^0.26.1",
+        "react-reconciler": "^0.26.2",
         "tslib": "^2.2.0",
         "typescript": "^4.2.4"
     },
