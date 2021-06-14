@@ -16,7 +16,6 @@ import atroot from "postcss-atroot";
 // @ts-expect-error missing types
 import extendRule from "postcss-extend-rule";
 import nested from "postcss-nested";
-// @ts-expect-error missing types
 import propertyLookup from "postcss-property-lookup";
 
 import { renderChunk } from "./ssr";
