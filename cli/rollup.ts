@@ -7,7 +7,6 @@ import { nodeResolve } from "@rollup/plugin-node-resolve";
 import commonjs from "@rollup/plugin-commonjs";
 
 import postcss from "postcss";
-// @ts-expect-error missing types
 import modules from "postcss-modules";
 // @ts-expect-error missing types
 import advancedVariables from "postcss-advanced-variables";
