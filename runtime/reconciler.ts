@@ -1,7 +1,7 @@
 import Reconciler from "react-reconciler";
 
 type Type = string;
-type Props = Record<string, any> | typeof HYDRATION;
+type Props = Record<string, any>;
 type Container = Panel;
 type Instance = Panel;
 type TextInstance = never;
@@ -60,10 +60,8 @@ function applyPropList(instance: Instance, props: UpdatePayload) {
                 // Diff
                 for (const [name, isActive] of value) {
                     if (isActive) {
-                        $.Msg(`AddClass "${name}"`);
                         instance.AddClass(name);
                     } else {
-                        $.Msg(`RemoveClass "${name}"`);
                         instance.RemoveClass(name);
                     }
                 }
@@ -95,8 +93,17 @@ function applyPropList(instance: Instance, props: UpdatePayload) {
     }
 }
 
+/**
+ * Special flag used as "previous props" when computing the updates to be applied to an hydrating instance
+ */
 const HYDRATION = Symbol("hydration");
 
+/**
+ * Checks whether the styles object has changed between the previous and the next version
+ * @param oldStyle the previous version of the styles object
+ * @param newStyle the next version of the styles
+ * @returns true if the styles differ, false otherwise
+ */
 function computeStyleDiff(oldStyle: any, newStyle: any) {
     const activeStyles = new Set();
 
@@ -116,11 +123,19 @@ function computeStyleDiff(oldStyle: any, newStyle: any) {
     return false;
 }
 
+type ClassDiff = [string, boolean][];
+
+/**
+ * Compute the difference between two class strings, tokenized on white spaces
+ * @param oldClass the previous class string
+ * @param newClass the next class string
+ * @returns a list of classes to be added or removed
+ */
 function computeClassDiff(oldClass: string, newClass: string) {
     const prevList = new Set(oldClass ? oldClass.split(/\s+/) : []);
     const nextList = new Set(newClass ? newClass.split(/\s+/) : []);
 
-    const classes = [];
+    const classes: ClassDiff = [];
 
     for (const entry of nextList) {
         if (!prevList.has(entry)) {
@@ -137,13 +152,18 @@ function computeClassDiff(oldClass: string, newClass: string) {
     return classes;
 }
 
-function computeDiff(oldProps: Props, newProps: Props): UpdatePayload {
+type PrevProps = Props | typeof HYDRATION;
+
+function computeDiff(oldProps: PrevProps, newProps: Props): UpdatePayload {
     const result: UpdatePayload = [];
     const active = new Set();
 
     for (const [key, value] of Object.entries(newProps)) {
         active.add(key);
 
+        // When hydrating we're only interested in attaching event handlers, at the
+        // moment no consistency check is performed between the hydrating instance
+        // and the initial props, and all non-event handler props are simply skipped
         if (oldProps === HYDRATION) {
             if (key.startsWith("on")) {
                 result.push([key, [value, true]]);
@@ -167,6 +187,9 @@ function computeDiff(oldProps: Props, newProps: Props): UpdatePayload {
                 continue;
             }
 
+            // When the event handler function has changed, two diff
+            // event are emitted: the first to detach the previous handler
+            // and the second to attach the next one
             if (key.startsWith("on")) {
                 result.push([key, [prevValue, false]]);
                 result.push([key, [value, true]]);
@@ -186,6 +209,8 @@ function computeDiff(oldProps: Props, newProps: Props): UpdatePayload {
         }
     }
 
+    // If the instance is not being hydrated, handle removal of props
+    // that are not longer present in newProps
     if (oldProps !== HYDRATION) {
         for (const [key, value] of Object.entries(oldProps)) {
             if (!active.has(key)) {
@@ -298,24 +323,20 @@ const CONFIG: Config = {
     },
 
     insertBefore(parentInstance, child, beforeChild) {
-        $.Msg("insertBefore");
         child.SetParent(parentInstance);
         parentInstance.MoveChildBefore(child, beforeChild);
     },
 
     insertInContainerBefore(container, child, beforeChild) {
-        $.Msg("insertInContainerBefore");
         child.SetParent(container);
         container.MoveChildBefore(child, beforeChild);
     },
 
     removeChild(parentInstance, child) {
-        $.Msg("removeChild");
         child.DeleteAsync(0); // SetParent(null);
     },
 
     removeChildFromContainer(container, child) {
-        $.Msg("removeChildFromContainer");
         child.DeleteAsync(0); // SetParent(null);
     },
 
@@ -360,7 +381,6 @@ const CONFIG: Config = {
     },
 
     clearContainer(container) {
-        $.Msg("clearContainer");
         container.RemoveAndDeleteChildren();
     },
 

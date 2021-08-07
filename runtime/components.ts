@@ -4,6 +4,7 @@ export const Button = "Button";
 export const Label = "Label";
 export const TextEntry = "TextEntry";
 export const DropDown = "DropDown";
+export const TextButton = "TextButton";
 export const ToggleButton = "ToggleButton";
 export const RadioButton = "RadioButton";
 export const ProgressBar = "ProgressBar";
@@ -13,6 +14,12 @@ export const ChaosMainMenu = "ChaosMainMenu";
 export const ChaosPopupManager = "ChaosPopupManager";
 export const ContextMenuManager = "ContextMenuManager";
 export const ChaosTooltipManager = "ChaosTooltipManager";
+
+export const ChaosHud = "ChaosHud";
+export const ChaosHudChat = "ChaosHudChat";
+export const ChaosHudVote = "ChaosHudVote";
+
+export const PopupCustomLayout = "PopupCustomLayout";
 
 declare namespace Panorama {
     export interface BaseProps {
@@ -52,9 +59,17 @@ declare namespace Panorama {
         onActivated?(): void;
     }
 
+    export interface TextButtonProps extends ButtonProps {
+        text?: string;
+    }
+
     export interface LabelProps extends PanelProps<LabelPanel> {
         html?: boolean;
         text?: string;
+    }
+
+    export interface TextEntryProps extends PanelProps<LabelPanel> {
+        activationenabled?: boolean;
     }
 
     // eslint-disable-next-line @typescript-eslint/no-empty-interface
@@ -62,6 +77,10 @@ declare namespace Panorama {
 
     export interface ChaosMainMenuProps extends PanelProps {
         useglobalcontext?: boolean;
+    }
+
+    export interface PopupProps extends PanelProps {
+        popupbackground?: string;
     }
 }
 
@@ -72,8 +91,9 @@ declare global {
             Image: Panorama.ImageProps;
             Button: Panorama.ButtonProps;
             Label: Panorama.LabelProps;
-            TextEntry: Panorama.PanelProps;
+            TextEntry: Panorama.TextEntryProps;
             DropDown: Panorama.PanelProps;
+            TextButton: Panorama.TextButtonProps;
             ToggleButton: Panorama.PanelProps;
             RadioButton: Panorama.PanelProps;
             ProgressBar: Panorama.ProgressBarProps;
@@ -83,6 +103,11 @@ declare global {
             ChaosPopupManager: Panorama.PanelProps;
             ContextMenuManager: Panorama.PanelProps;
             ChaosTooltipManager: Panorama.PanelProps;
+            ChaosHud: Panorama.PanelProps;
+            ChaosHudChat: Panorama.PanelProps;
+            ChaosHudVote: Panorama.PanelProps;
+
+            PopupCustomLayout: Panorama.PopupProps;
 
             root: Panorama.BaseProps;
             styles: Panorama.BaseProps;

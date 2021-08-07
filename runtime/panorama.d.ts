@@ -15,6 +15,10 @@ declare class Panel {
     GetChildCount(): number;
     GetChild(index: number): Panel;
     MoveChildBefore(child: Panel, before: Panel): void;
+
+    GetAttributeInt(key: string, deflt: number): number;
+    GetAttributeString(key: string, deflt: string): string;
+    SetDialogVariable(key: string, value: any): void;
 }
 
 declare class LabelPanel extends Panel {
@@ -32,68 +36,110 @@ declare class ProgressBarPanel extends Panel {
 
 declare class $ {
     static Msg(...args: any[]): void;
-    static DispatchEvent(event: string): void;
+    static DispatchEvent(event: string, ...args: any[]): void;
     static RegisterForUnhandledEvent(
         eventName: string,
-        functionHandle: () => void,
+        functionHandle: (...args: any[]) => void,
     ): void;
     static RegisterEventHandler(
         eventName: string,
         panel: Panel,
-        functionHandle: () => void,
+        functionHandle: (...args: any[]) => void,
     ): void;
     static UnregisterEventHandler(
         eventName: string,
         panel: Panel,
-        functionHandle: () => void,
+        functionHandle: (...args: any[]) => void,
     ): void;
     static UnregisterForUnhandledEvent(
         eventName: string,
-        functionHandle: () => void,
+        functionHandle: (...args: any[]) => void,
     ): void;
     static GetContextPanel(): Panel;
     static CreatePanel(type: string, parent: Panel, id: string): Panel;
     static Schedule(delay: number, func: () => void): void;
     static CancelScheduled(func: () => void): void;
+    static DefineEvent(
+        event: string,
+        argsCount: number,
+        argsDoc: string,
+        eventDoc: string,
+    ): void;
+    static FindChildInContext(query: string): Panel;
+    static Localize(key: string): string;
+    static RegisterKeyBind(panel: Panel, keys: string, cb: () => void): void;
+    static UrlEncode(input: string): string;
+    static UrlDecode(input: string): string;
+    static HTMLEscape(input: string): string;
 
-    static DefineEvent(): any;
     static DefinePanelEvent(): any;
     static DispatchEventAsync(): any;
-    static FindChildInContext(): any;
     static AsyncWebRequest(): any;
-    static Localize(): any;
     static Language(): any;
-    static RegisterKeyBind(): any;
     static Each(): any;
     static DbgIsReloadingScript(): any;
-    static UrlEncode(): any;
-    static UrlDecode(): any;
-    static HTMLEscape(): any;
 }
 
 declare class GameInterfaceAPI {
-    static SetSettingString(settingName: any, value: any): any;
-    static ConsoleCommand(command: any): any;
-
-    static GetSettingString(): any;
+    static GetSettingString(settingName: string): string;
+    static SetSettingString(settingName: string, value: string): void;
+    static ConsoleCommand(command: string): void;
 }
 
 declare class UiToolkitAPI {
-    static ShowCustomLayoutPopup(popupId: any, layoutFile: any): any;
+    static ShowCustomLayoutPopup(popupId: string, layoutFile: string): void;
     static ShowGenericPopupTwoOptionsBgStyle(
-        title: any,
-        message: any,
-        style: any,
-        option1Name: any,
-        option1Function: any,
-        option2Name: any,
-        option2Function: any,
-        bgStyle: any,
-    ): any;
+        title: string,
+        message: string,
+        style: string,
+        option1Name: string,
+        option1Function: () => void,
+        option2Name: string,
+        option2Function: () => void,
+        bgStyle: string,
+    ): void;
+    static AddDenyAllInputToGame(
+        panel: Panel,
+        debugContextName: string,
+        whatInput: string,
+    ): number;
+    static ReleaseDenyAllInputToGame(handle: number): void;
+    static AddDenyMouseInputToGame(
+        panel: Panel,
+        debugContextName: string,
+        whatInput: string,
+    ): number;
+    static ReleaseDenyMouseInputToGame(handle: number): void;
+    static ShowGenericPopup(
+        title: string,
+        message: string,
+        style: string,
+    ): void;
+    static ShowGlobalCustomLayoutPopup(id: string, layout: string): void;
+    static CloseAllVisiblePopups(): void;
+    static RegisterJSCallback(cb: (...args: any[]) => any): number;
+    static InvokeJSCallback(cb: number, ...args: any[]): any;
+    static UnregisterJSCallback(cb: number): void;
+    static ShowGenericPopupOk(
+        title: string,
+        message: string,
+        style: string,
+        ok: () => void,
+        cancel: () => void,
+    ): void;
+    static ShowGenericPopupCancel(
+        title: string,
+        message: string,
+        style: string,
+        cancel: () => void,
+    ): void;
+    static GetGlobalObject(): any;
+    static RegisterPanel2d(panel: string, layout: string): void;
+    static ProfilingScopeBegin(scope: string): void;
+    static ProfilingScopeEnd(): number;
+    static MakeStringSafe(input: string): string;
+    static IsPanoramaInECOMode(): bool;
 
-    static ShowGenericPopup(): any;
-    static ShowGenericPopupOk(): any;
-    static ShowGenericPopupCancel(): any;
     static ShowGenericPopupYesNo(): any;
     static ShowGenericPopupOkCancel(): any;
     static ShowGenericPopupYesNoCancel(): any;
@@ -109,8 +155,6 @@ declare class UiToolkitAPI {
     static ShowGenericPopupOneOptionBgStyle(): any;
     static ShowGenericPopupThreeOptionsBgStyle(): any;
     static ShowCustomLayoutPopupParameters(): any;
-    static CloseAllVisiblePopups(): any;
-    static ShowGlobalCustomLayoutPopup(): any;
     static ShowGlobalCustomLayoutPopupParameters(): any;
     static ShowTextTooltip(): any;
     static ShowTextTooltipOnPanel(): any;
@@ -133,17 +177,4 @@ declare class UiToolkitAPI {
     static ShowCustomLayoutContextMenu(): any;
     static ShowCustomLayoutContextMenuParameters(): any;
     static ShowCustomLayoutContextMenuParametersDismissEvent(): any;
-    static RegisterJSCallback(): any;
-    static InvokeJSCallback(): any;
-    static UnregisterJSCallback(): any;
-    static GetGlobalObject(): any;
-    static RegisterPanel2d(): any;
-    static ProfilingScopeBegin(): any;
-    static ProfilingScopeEnd(): any;
-    static AddDenyAllInputToGame(): any;
-    static ReleaseDenyAllInputToGame(): any;
-    static AddDenyMouseInputToGame(): any;
-    static ReleaseDenyMouseInputToGame(): any;
-    static MakeStringSafe(): any;
-    static IsPanoramaInECOMode(): any;
 }

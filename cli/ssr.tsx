@@ -19,6 +19,8 @@ process.env.NODE_ENV = prevEnv;
 type RootComponent = React.ComponentType & {
     document?(children: React.ReactNode): React.ReactNode;
     snippets?: React.ReactNode;
+    stylesheets?: string[];
+    scripts?: string[];
 };
 
 function createSandbox(roots: RootComponent[]) {
@@ -87,20 +89,32 @@ export function renderChunk(
         snippets = Component.snippets;
     }
 
+    const styles = Array.from(
+        stylesheets,
+        (fileName) => `file://{resources}/styles/${fileName}`,
+    );
+    if (Component.stylesheets) {
+        styles.push(...Component.stylesheets);
+    }
+
+    const scripts = [`file://{resources}/${file.fileName}`];
+    if (Component.scripts) {
+        scripts.push(...Component.scripts);
+    }
+
     return renderElement(
         <root>
-            {stylesheets.size > 0 && (
+            {styles.length > 0 && (
                 <styles>
-                    {Array.from(stylesheets, (fileName) => (
-                        <include
-                            key={fileName}
-                            src={`file://{resources}/styles/${fileName}`}
-                        />
+                    {styles.map((src) => (
+                        <include key={src} src={src} />
                     ))}
                 </styles>
             )}
             <scripts>
-                <include src={`file://{resources}/${file.fileName}`} />
+                {scripts.map((src) => (
+                    <include key={src} src={src} />
+                ))}
             </scripts>
             {snippets}
             {element}

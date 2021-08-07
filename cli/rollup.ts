@@ -1,4 +1,4 @@
-import { join, relative } from "path";
+import { dirname, join, relative } from "path";
 
 import type { InputOptions, OutputOptions } from "rollup";
 import replace from "@rollup/plugin-replace";
@@ -120,7 +120,11 @@ export function makeRollupConfig(config: Config, path: string): RollupConfig {
                         if (file.type === "chunk" && file.isEntry) {
                             this.emitFile({
                                 type: "asset",
-                                name: `layout/${file.name}.xml`,
+                                name: join(
+                                    "layout",
+                                    dirname(path),
+                                    `${file.name}.xml`,
+                                ),
                                 source: renderChunk(file, stylesheets),
                             });
                         }
@@ -134,7 +138,11 @@ export function makeRollupConfig(config: Config, path: string): RollupConfig {
         output: {
             dir: config.outDir,
             assetFileNames: "[name][extname]",
-            entryFileNames: "scripts/components/[name].js",
+            entryFileNames: join(
+                "scripts/components",
+                dirname(path),
+                "[name].js",
+            ),
             format: "iife",
 
             name: uid,
