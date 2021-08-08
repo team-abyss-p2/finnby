@@ -230,4 +230,84 @@ describe("styled", () => {
 
         expect(StyledPanel.displayName).toBe("styled(Styled)");
     });
+
+    it("should render static styles as classes", () => {
+        // @ts-expect-error static not part of the public API
+        const StyledPanel = styled.static.Panel("staticClass");
+
+        const renderer = Renderer.create(<StyledPanel />);
+
+        expect(renderer.toJSON()).toMatchObject({
+            type: "Panel",
+            children: null,
+            props: {
+                class: "staticClass",
+            },
+        });
+    });
+
+    it("should render nested static and dynamic styles", () => {
+        // @ts-expect-error static not part of the public API
+        const PanelA = styled.static.Panel("class-a");
+
+        // @ts-expect-error static not part of the public API
+        const PanelB = styled.static(PanelA)("class-b");
+
+        const PanelC = styled(PanelB)`
+            color: red;
+        `;
+
+        const renderer = Renderer.create(<PanelC />);
+
+        expect(renderer.toJSON()).toMatchObject({
+            type: "Panel",
+            children: null,
+            props: {
+                class: "class-b class-a",
+                style: { color: "red" },
+            },
+        });
+    });
+
+    it("should forward the withComponent method to other styled components", () => {
+        const PanelA = styled.Panel`
+            color: red;
+        `;
+
+        const PanelB = styled(PanelA)`
+            background-color: blue;
+        `;
+
+        // @ts-expect-error implicit prop type
+        const PanelC = PanelB.withComponent("Image");
+
+        const renderer = Renderer.create(<PanelC />);
+
+        expect(renderer.toJSON()).toMatchObject({
+            type: "Image",
+            children: null,
+            props: {
+                style: { color: "red", backgroundColor: "blue" },
+            },
+        });
+    });
+    it("should forward the as prop to other styled components", () => {
+        const PanelA = styled.Panel`
+            color: red;
+        `;
+
+        const PanelB = styled(PanelA)`
+            background-color: blue;
+        `;
+
+        const renderer = Renderer.create(<PanelB as="Image" />);
+
+        expect(renderer.toJSON()).toMatchObject({
+            type: "Image",
+            children: null,
+            props: {
+                style: { color: "red", backgroundColor: "blue" },
+            },
+        });
+    });
 });

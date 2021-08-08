@@ -28,7 +28,7 @@ interface StyledOptions {
 
 const defaultShouldForwardProp = (prop: string) => prop !== "as";
 
-const getDisplayName = (primitive: ElementType) =>
+const getDisplayName = <P>(primitive: ElementType<P>) =>
     typeof primitive === "string"
         ? primitive
         : primitive.displayName || primitive.name || "Styled";
@@ -41,6 +41,16 @@ function isTemplate<P>(styles: Style<P>): styles is StylesheetTemplate<P> {
 
 type Empty = Record<string, unknown>;
 
+function isStyled<P>(
+    component: ElementType<P>,
+): component is StyledComponent<P> {
+    if (typeof component === "string") {
+        return false;
+    }
+
+    return "isStyled" in component && component["isStyled"] === true;
+}
+
 function createStyled<C = Empty>(
     component: ElementType<C>,
     options?: StyledOptions,
@@ -48,7 +58,7 @@ function createStyled<C = Empty>(
     const shouldForwardProp =
         options?.shouldForwardProp ?? defaultShouldForwardProp;
 
-    const shouldUseAs = !shouldForwardProp("as");
+    const shouldUseAs = !isStyled(component) && !shouldForwardProp("as");
 
     return function createStyledComponent<P = Empty>(...rawStyles: Style<P>) {
         let styles: Interpolation<P>[];
@@ -67,10 +77,7 @@ function createStyled<C = Empty>(
                 const newProps: any = {};
 
                 for (const key in props) {
-                    if (shouldUseAs && key === "as") {
-                        continue;
-                    }
-                    if (shouldForwardProp(key)) {
+                    if (key === "as" ? !shouldUseAs : shouldForwardProp(key)) {
                         newProps[key] = props[key];
                     }
                 }
@@ -86,9 +93,14 @@ function createStyled<C = Empty>(
         );
 
         return Object.assign(Styled, {
+            isStyled: true,
             displayName: `styled(${getDisplayName(component)})`,
             withComponent: (newComponent: ElementType<C>) =>
-                createStyled(newComponent)(...rawStyles),
+                createStyled(
+                    isStyled(component)
+                        ? component.withComponent(newComponent)
+                        : newComponent,
+                )(...rawStyles),
         });
     };
 }
@@ -100,7 +112,7 @@ function createStatic<C = Empty>(
     const shouldForwardProp =
         options?.shouldForwardProp ?? defaultShouldForwardProp;
 
-    const shouldUseAs = !shouldForwardProp("as");
+    const shouldUseAs = !isStyled(component) && !shouldForwardProp("as");
 
     return function createStaticStyledComponent(className: string) {
         type ExtractRef<T> = T extends { ref?: Ref<infer R> } ? R : never;
@@ -111,10 +123,7 @@ function createStatic<C = Empty>(
             const newProps: any = {};
 
             for (const key in props) {
-                if (shouldUseAs && key === "as") {
-                    continue;
-                }
-                if (shouldForwardProp(key)) {
+                if (key === "as" ? !shouldUseAs : shouldForwardProp(key)) {
                     newProps[key] = props[key];
                 }
             }
@@ -128,9 +137,14 @@ function createStatic<C = Empty>(
         });
 
         return Object.assign(Styled, {
+            isStyled: true,
             displayName: `styled(${getDisplayName(component)})`,
             withComponent: (newComponent: ElementType<C>) =>
-                createStatic(newComponent)(className),
+                createStatic(
+                    isStyled(component)
+                        ? component.withComponent(newComponent)
+                        : newComponent,
+                )(className),
         });
     };
 }
