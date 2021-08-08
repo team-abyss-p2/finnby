@@ -6,6 +6,10 @@ const StyledPanel = styled.Panel`
     background-color: red;
 `;
 
+const StyledButton = styled.Button({
+    backgroundColor: "white",
+});
+
 const StyledLabel = styled(Label, {})`
     color: blue;
 `;
@@ -14,7 +18,9 @@ const StyledLabel = styled(Label, {})`
 export default function UserComponent() {
     return (
         <StyledPanel class="otherClass">
-            <StyledLabel style={{ paddingTop: "12px" }} />
+            <StyledButton>
+                <StyledLabel style={{ paddingTop: "12px" }} />
+            </StyledButton>
         </StyledPanel>
     );
 }

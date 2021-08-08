@@ -192,14 +192,42 @@ function tryFoldConstantStyle(
         className = `${config.uid}_${config.styles.length}`;
     }
 
-    if (typeof code.value === "string") {
-        config.styles.push(`.${className}{${code.value}}`);
-    } else {
-        throw new Error("Not implemented");
-    }
+    config.styles.push(`.${className}{${stringifyCss(code.value)}}`);
 
     return t.callExpression(newCallee, [
         t.stringLiteral(className),
         ...additionalArgs,
     ]);
+}
+
+function stringifyCss(input: any) {
+    if (typeof input == "string") {
+        return input;
+    }
+
+    if (typeof input === "object" && input !== null) {
+        let result = "";
+
+        for (const [key, value] of Object.entries(input)) {
+            result += `${kebabCase(key)}: ${value};`;
+        }
+
+        return result;
+    }
+
+    throw new Error("Not implemented");
+}
+
+function kebabCase(input: string) {
+    let result = "";
+
+    for (const char of input) {
+        if (char.toUpperCase() === char) {
+            result += `-${char.toLowerCase()}`;
+        } else {
+            result += char;
+        }
+    }
+
+    return result;
 }
