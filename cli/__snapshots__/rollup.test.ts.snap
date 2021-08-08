@@ -65,7 +65,7 @@ exports[`rollup should process stylesheet imports 1`] = `
 
     var React__default = /*#__PURE__*/_interopDefaultLegacy(React);
 
-    var styles = {\\"userClass\\":\\"_userClass_1uee3_1\\"};
+    var styles = {\\"userClass\\":\\"_userClass_1j71q_1\\"};
 
     function UserComponent() {
       return /*#__PURE__*/React__default['default'].createElement(finnby.Panel, {
@@ -80,10 +80,10 @@ UiToolkitAPI.GetGlobalObject().FinnbyRuntime._mount(_stylesheet_tsx, $.GetContex
 "
 `;
 
-exports[`rollup should process stylesheet imports 2`] = `"<root><styles><include src=\\"file://{resources}/styles/stylesheet.css\\"></include></styles><scripts><include src=\\"file://{resources}/scripts/components/stylesheet.js\\"></include></scripts><Panel><Panel class=\\"_userClass_1uee3_1\\"></Panel></Panel></root>"`;
+exports[`rollup should process stylesheet imports 2`] = `"<root><styles><include src=\\"file://{resources}/styles/stylesheet.css\\"></include></styles><scripts><include src=\\"file://{resources}/scripts/components/stylesheet.js\\"></include></scripts><Panel><Panel class=\\"_userClass_1j71q_1\\"></Panel></Panel></root>"`;
 
 exports[`rollup should process stylesheet imports 3`] = `
-"._userClass_1uee3_1 {
+"._userClass_1j71q_1 {
     color: red;
 }
 "
