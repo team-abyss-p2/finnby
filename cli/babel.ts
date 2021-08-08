@@ -1,14 +1,16 @@
 import { PluginObj, PluginPass, NodePath, types as t } from "@babel/core";
 
+interface StyledConfig {
+    uid: string;
+    styles: string[];
+}
+
 interface StyledState extends PluginPass {
     cssImport?: string;
     styledImport?: string;
 }
 
-export function styledPlugin(
-    uid: string,
-    styles: string[],
-): PluginObj<StyledState> {
+export function styledPlugin(config: StyledConfig): PluginObj<StyledState> {
     return {
         visitor: {
             ImportDeclaration(path, state) {
@@ -42,10 +44,19 @@ export function styledPlugin(
                 const tag = path.get("tag");
                 const quasi = path.get("quasi");
 
+                let nameHint: string | undefined;
+                const parent = path.parentPath;
+                if (parent && parent.isVariableDeclarator()) {
+                    const id = parent.get("id");
+                    if (id && id.isIdentifier()) {
+                        nameHint = id.node.name;
+                    }
+                }
+
                 const newNode = tryFoldConstantStyle(
-                    uid,
-                    styles,
+                    config,
                     state,
+                    nameHint,
                     tag,
                     quasi,
                 );
@@ -63,14 +74,23 @@ export function styledPlugin(
                 }
 
                 const [style, ...args] = path.get("arguments");
-                if (!style.isExpression()) {
+                if (!style || !style.isExpression()) {
                     return;
                 }
 
+                let nameHint: string | undefined;
+                const parent = path.parentPath;
+                if (parent && parent.isVariableDeclarator()) {
+                    const id = parent.get("id");
+                    if (id && id.isIdentifier()) {
+                        nameHint = id.node.name;
+                    }
+                }
+
                 const newNode = tryFoldConstantStyle(
-                    uid,
-                    styles,
+                    config,
                     state,
+                    nameHint,
                     callee,
                     style,
                     args.map((arg) => arg.node),
@@ -93,9 +113,9 @@ type Argument =
     | t.ArgumentPlaceholder;
 
 function tryFoldConstantStyle(
-    uid: string,
-    styles: string[],
+    config: StyledConfig,
     state: StyledState,
+    nameHint: string | undefined,
     expr: NodePath<t.Expression>,
     style: NodePath<t.Expression>,
     additionalArgs: Argument[] = [],
@@ -165,10 +185,15 @@ function tryFoldConstantStyle(
         return;
     }
 
-    const className = `_${uid}_${styles.length}`;
+    let className: string;
+    if (nameHint) {
+        className = `${config.uid}_${nameHint}`;
+    } else {
+        className = `${config.uid}_${config.styles.length}`;
+    }
 
     if (typeof code.value === "string") {
-        styles.push(`.${className}{${code.value}}`);
+        config.styles.push(`.${className}{${code.value}}`);
     } else {
         throw new Error("Not implemented");
     }

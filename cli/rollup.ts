@@ -48,7 +48,7 @@ export function makeRollupConfig(config: Config, path: string): RollupConfig {
                 plugins: [
                     "@babel/plugin-proposal-class-properties",
                     "@babel/plugin-proposal-nullish-coalescing-operator",
-                    styledPlugin(uid, extractedStyles),
+                    styledPlugin({ uid, styles: extractedStyles }),
                 ],
                 presets: [
                     "@babel/preset-typescript",
@@ -118,10 +118,25 @@ export function makeRollupConfig(config: Config, path: string): RollupConfig {
             },
             {
                 name: "finnby-output",
-                generateBundle(options, bundle) {
+                async generateBundle(options, bundle) {
                     for (const file of Object.values(bundle)) {
                         if (file.type === "chunk" && file.isEntry) {
                             if (extractedStyles.length > 0) {
+                                const processor = postcss(
+                                    config.postcss([
+                                        advancedVariables(),
+                                        atroot(),
+                                        extendRule(),
+                                        nested(),
+                                        propertyLookup(),
+                                    ]),
+                                );
+
+                                const code = extractedStyles.join("\n");
+                                const { css } = await processor.process(code, {
+                                    from: file.fileName,
+                                });
+
                                 this.emitFile({
                                     type: "asset",
                                     name: join(
@@ -129,8 +144,9 @@ export function makeRollupConfig(config: Config, path: string): RollupConfig {
                                         dirname(path),
                                         `finnby/${file.name}.css`,
                                     ),
-                                    source: extractedStyles.join("\n"),
+                                    source: css,
                                 });
+
                                 stylesheets.add(
                                     join(
                                         dirname(path),
