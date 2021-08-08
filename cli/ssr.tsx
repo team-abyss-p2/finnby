@@ -1,4 +1,5 @@
 import { runInNewContext } from "vm";
+import { sep } from "path";
 
 import * as React from "react";
 import type { OutputChunk } from "rollup";
@@ -63,6 +64,9 @@ function renderElement(elem: React.ReactElement) {
         .replace(/style="([^"]+)"/g, `style="$1;"`);
 }
 
+const SEPARATOR = new RegExp(sep.replace("\\", "\\\\"), "g");
+const normalize = (path: string) => path.replace(SEPARATOR, "/");
+
 export function renderChunk(
     file: OutputChunk,
     stylesheets: Set<string>,
@@ -94,15 +98,15 @@ export function renderChunk(
 
     const styles = Array.from(
         stylesheets,
-        (fileName) => `file://{resources}/styles/${fileName}`,
+        (fileName) => `file://{resources}/styles/${normalize(fileName)}`,
     );
     if (Component.stylesheets) {
-        styles.push(...Component.stylesheets);
+        styles.push(...Component.stylesheets.map(normalize));
     }
 
-    const scripts = [`file://{resources}/${file.fileName}`];
+    const scripts = [`file://{resources}/${normalize(file.fileName)}`];
     if (Component.scripts) {
-        scripts.push(...Component.scripts);
+        scripts.push(...Component.scripts.map(normalize));
     }
 
     return renderElement(

@@ -14,7 +14,7 @@ const StyledLabel = styled(Label, {})`
 export default function UserComponent() {
     return (
         <StyledPanel class="otherClass">
-            <StyledLabel styles={{ paddingTop: "12px" }} />
+            <StyledLabel style={{ paddingTop: "12px" }} />
         </StyledPanel>
     );
 }
