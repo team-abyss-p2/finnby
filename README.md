@@ -145,11 +145,6 @@ module.exports = {
     to pickup new files
 -   More / better TypeScript declarations: right now the ones included are
     extremely barebone
--   Support for styled-components would be nice as that model fits better with
-    React than loading an external CSS file, but since the engine does not
-    expose a way to declare new stylesheets at runtime they will need to rely on
-    a babel transform to extract the static parts ahead of time and use inline
-    styles for everything else. It's possible but hasn't been tested yet.
 -   The CLI is using Rollup as a bundler for simplicity since it's also what's
     used to package the CLI and runtime, but if the capabilities needed for hot
     reloading get unlocked in the engine this will get switched over to Metro.
