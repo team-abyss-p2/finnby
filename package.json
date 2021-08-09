@@ -66,7 +66,7 @@
         "postcss-atroot": "^0.2.3",
         "postcss-extend-rule": "^3.0.0",
         "postcss-modules": "^4.2.2",
-        "postcss-nested": "^5.0.5",
+        "postcss-nested": "^5.0.6",
         "postcss-property-lookup": "^3.0.0",
         "react": "^17.0.2",
         "react-dom": "^17.0.2",
