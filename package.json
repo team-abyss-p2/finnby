@@ -58,7 +58,7 @@
         "@rollup/plugin-babel": "^5.3.0",
         "@rollup/plugin-commonjs": "^20.0.0",
         "@rollup/plugin-node-resolve": "^13.0.0",
-        "@rollup/plugin-replace": "^2.4.2",
+        "@rollup/plugin-replace": "^3.0.0",
         "cosmiconfig": "^7.0.0",
         "css-to-react-native": "^3.0.0",
         "postcss": "^8.3.6",
