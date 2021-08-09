@@ -8,6 +8,8 @@ Next.js
 -   Start writing Panorama components using React, no configuration required
 -   TypeScript compilation supported out of the box, includes definitions for
     most Panorama APIs
+-   Supports styled components including automatic extraction of static styles
+    into external stylesheet files
 -   Includes PreCSS and CSS Modules, seamlessly import CSS files into JavaScript
 -   Automatically generates static XML layouts from your components and
     rehydrates them at runtime for better startup performances
@@ -73,48 +75,44 @@ it will start the Finnby CLI in watch mode, rebuilding your code automatically
 on every change.
 
 Now what if we want our panel to fade in when it get loaded ? In Panorama
-animations use CSS keyframes, so we'll need to create a new CSS file alongside
-our component:
+animations use CSS keyframes, but while Finnby does support importing CSS files
+it's generally simpler to declare the styles alongside the components using
+styled components:
 
-```css
-@keyframes fade-in {
+```js
+import * as React from "react";
+import { keyframes, styled, Label } from "@team-abyss-p2/finnby";
+
+const fadeIn = keyframes`
     from {
         opacity: 0;
     }
     to {
         opacity: 1;
     }
-}
+`;
 
-.fadeIn {
+const AnimatedPanel = styled.Panel`
     height: 100%;
     width: 100%;
 
-    animation-name: fade-in;
+    animation-name: ${fadeIn};
     animation-duration: 750ms;
     animation-timing-function: ease-out;
-}
-```
-
-Now let's load this style into our component:
-
-```js
-import * as React from "react";
-import { Panel, Label } from "@team-abyss-p2/finnby";
-
-import styles from "./mycomponent.css";
+`;
 
 export default function MyComponent() {
     return (
-        <Panel style={styles.fadeIn}>
+        <AnimatedPanel>
             <Label text="Hello World" />
-        </Panel>
+        </AnimatedPanel>
     );
 }
 ```
 
-Thanks to CSS modules, we can simply import the CSS file in JavaScript and
-reference the `fadeIn` class by name
+During compilation Finnby will automatically analyze your JavaScript source
+files and pull all these styles into a CSS file that gets automatically imported
+into your layout
 
 ## Configuration
 
@@ -156,3 +154,9 @@ module.exports = {
 -   Automatically create a `tsconfig.json` file in the project directory like
     create-react-app and next.js do if a `.ts` or `.tsx` file is detected to
     make moving to TypeScript easier
+-   The PostCSS nesting plugins helps in writing complex selectors in styled
+    components, being able to reference other components in nested selectors
+    would be nice to have
+-   The `css` function is sort of useless right now since it's unsupported in
+    the Babel plugin, meaning it cannot be statically extracted nor inlined into
+    other styles
