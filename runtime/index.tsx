@@ -3,7 +3,7 @@
 
 import * as React from "react";
 
-import styled, { css } from "./styled";
+import styled, { css, keyframes } from "./styled";
 import * as Components from "./components";
 import * as Hooks from "./hooks";
 import { Renderer } from "./reconciler";
@@ -17,6 +17,7 @@ Object.assign(UiToolkitAPI.GetGlobalObject(), {
     FinnbyRuntime: {
         styled,
         css,
+        keyframes,
         ...Components,
         ...Hooks,
         _mount(Component: React.ComponentType, root: Panel) {
@@ -30,6 +31,6 @@ Object.assign(UiToolkitAPI.GetGlobalObject(), {
     },
 });
 
-export { styled, css };
+export { styled, css, keyframes };
 export * from "./components";
 export * from "./hooks";

@@ -1,4 +1,5 @@
 import { PluginObj, PluginPass, NodePath, types as t } from "@babel/core";
+import type { Binding } from "@babel/traverse";
 
 interface StyledConfig {
     uid: string;
@@ -6,13 +7,50 @@ interface StyledConfig {
 }
 
 interface StyledState extends PluginPass {
-    cssImport?: string;
+    keyframesImport?: string;
     styledImport?: string;
+}
+
+function isAlive(path: NodePath): boolean {
+    if (path.removed) {
+        return false;
+    }
+
+    const { parentPath } = path;
+    if (!parentPath) {
+        return path.isProgram();
+    }
+
+    if (parentPath.node !== path.parent) {
+        return false;
+    }
+
+    return isAlive(parentPath);
 }
 
 export function styledPlugin(config: StyledConfig): PluginObj<StyledState> {
     return {
         visitor: {
+            Program: {
+                exit(program, state) {
+                    if (!state.keyframesImport) {
+                        return;
+                    }
+
+                    const binding = program.scope.getBinding(
+                        state.keyframesImport,
+                    );
+
+                    if (!binding) {
+                        return;
+                    }
+
+                    const hasReferences = binding.referencePaths.some(isAlive);
+                    if (!hasReferences) {
+                        binding.path.remove();
+                    }
+                },
+            },
             ImportDeclaration(path, state) {
                 const source = path.get("source");
                 if (source.node.value !== "@team-abyss-p2/finnby") {
@@ -31,8 +69,8 @@ export function styledPlugin(config: StyledConfig): PluginObj<StyledState> {
 
                     const local = specifier.get("local");
                     switch (imported.node.name) {
-                        case "css":
-                            state.cssImport = local.node.name;
+                        case "keyframes":
+                            state.keyframesImport = local.node.name;
                             continue;
                         case "styled":
                             state.styledImport = local.node.name;
@@ -44,28 +82,22 @@ export function styledPlugin(config: StyledConfig): PluginObj<StyledState> {
                 const tag = path.get("tag");
                 const quasi = path.get("quasi");
 
-                let nameHint: string | undefined;
-                const parent = path.parentPath;
-                if (parent && parent.isVariableDeclarator()) {
-                    const id = parent.get("id");
-                    if (id && id.isIdentifier()) {
-                        nameHint = id.node.name;
-                    }
-                }
-
-                const newNode = tryFoldConstantStyle(
-                    config,
-                    state,
-                    nameHint,
-                    tag,
-                    quasi,
+                const binding = Object.values(path.scope.bindings).find(
+                    (binding) => binding.path.isAncestor(path),
                 );
+
+                const newNode = tryFoldConstantStyle(config, state, {
+                    binding,
+                    expr: tag,
+                    style: quasi,
+                });
 
                 if (!newNode) {
                     return;
                 }
 
                 path.replaceWith(newNode);
+                path.addComment("leading", "#__PURE__");
             },
             CallExpression(path, state) {
                 const callee = path.get("callee");
@@ -78,29 +110,23 @@ export function styledPlugin(config: StyledConfig): PluginObj<StyledState> {
                     return;
                 }
 
-                let nameHint: string | undefined;
-                const parent = path.parentPath;
-                if (parent && parent.isVariableDeclarator()) {
-                    const id = parent.get("id");
-                    if (id && id.isIdentifier()) {
-                        nameHint = id.node.name;
-                    }
-                }
-
-                const newNode = tryFoldConstantStyle(
-                    config,
-                    state,
-                    nameHint,
-                    callee,
-                    style,
-                    args.map((arg) => arg.node),
+                const binding = Object.values(path.scope.bindings).find(
+                    (binding) => binding.path.isAncestor(path),
                 );
+
+                const newNode = tryFoldConstantStyle(config, state, {
+                    binding,
+                    expr: callee,
+                    style,
+                    additionalArgs: args.map((arg) => arg.node),
+                });
 
                 if (!newNode) {
                     return;
                 }
 
                 path.replaceWith(newNode);
+                path.addComment("leading", "#__PURE__");
             },
         },
     };
@@ -112,16 +138,24 @@ type Argument =
     | t.JSXNamespacedName
     | t.ArgumentPlaceholder;
 
+interface StyledArgs {
+    binding: Binding | undefined;
+    expr: NodePath<t.Expression>;
+    style: NodePath<t.Expression>;
+    additionalArgs?: Argument[];
+}
+
 function tryFoldConstantStyle(
     config: StyledConfig,
     state: StyledState,
-    nameHint: string | undefined,
-    expr: NodePath<t.Expression>,
-    style: NodePath<t.Expression>,
-    additionalArgs: Argument[] = [],
+    args: StyledArgs,
 ) {
+    const { uid, styles } = config;
+    const { binding, expr, style, additionalArgs = [] } = args;
+
     let styledProp: NodePath<t.Expression | t.PrivateName> | undefined;
     let styledArgs: NodePath<Argument>[] | undefined;
+    let isKeyframes = false;
 
     if (expr.isMemberExpression()) {
         // styled.Panel() / styled.Panel``
@@ -146,9 +180,13 @@ function tryFoldConstantStyle(
 
         styledArgs = expr.get("arguments");
     } else if (expr.isIdentifier()) {
-        // css() / css``
-        if (expr.node.name !== state.cssImport) {
-            return;
+        switch (expr.node.name) {
+            // keyframes() / keyframes``
+            case state.keyframesImport:
+                isKeyframes = true;
+                break;
+            default:
+                return;
         }
     } else {
         return;
@@ -176,23 +214,29 @@ function tryFoldConstantStyle(
             ),
             styledArgs.map((arg) => arg.node),
         );
-    } else if (state.cssImport) {
+    } else if (isKeyframes && state.keyframesImport) {
         newCallee = t.memberExpression(
-            t.identifier(state.cssImport),
+            t.identifier(state.keyframesImport),
             t.identifier("static"),
         );
     } else {
         return;
     }
 
-    let className: string;
-    if (nameHint) {
-        className = `${config.uid}_${nameHint}`;
-    } else {
-        className = `${config.uid}_${config.styles.length}`;
+    const position = styles.length;
+    let className = `${uid}_${position}`;
+
+    if (binding) {
+        const name = binding.identifier.name;
+        className = `${className}_${name}`;
     }
 
-    config.styles.push(`.${className}{${stringifyCss(code.value)}}`);
+    if (isKeyframes) {
+        styles.push(`@keyframes ${className}{${stringifyCss(code.value)}}`);
+        return t.stringLiteral(className);
+    }
+
+    styles.push(`.${className}{${stringifyCss(code.value)}}`);
 
     return t.callExpression(newCallee, [
         t.stringLiteral(className),

@@ -26,9 +26,9 @@ exports[`rollup should extract classes from styled components 1`] = `
 
     var React__default = /*#__PURE__*/_interopDefaultLegacy(React);
 
-    const StyledPanel = finnby.styled.static.Panel(\\"_styled_tsx_StyledPanel\\");
-    const StyledButton = finnby.styled.static.Button(\\"_styled_tsx_StyledButton\\");
-    const StyledLabel = finnby.styled.static(finnby.Label, {})(\\"_styled_tsx_StyledLabel\\"); // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
+    const StyledPanel = /*#__PURE__*/finnby.styled.static.Panel(\\"_styled_tsx_0_StyledPanel\\");
+    const StyledButton = /*#__PURE__*/finnby.styled.static.Button(\\"_styled_tsx_1_StyledButton\\");
+    const StyledLabel = /*#__PURE__*/finnby.styled.static(finnby.Label, {})(\\"_styled_tsx_3_StyledLabel\\"); // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
 
     function UserComponent() {
       return /*#__PURE__*/React__default['default'].createElement(StyledPanel, {
@@ -47,15 +47,24 @@ UiToolkitAPI.GetGlobalObject().FinnbyRuntime._mount(_styled_tsx, $.GetContextPan
 "
 `;
 
-exports[`rollup should extract classes from styled components 2`] = `"<root><styles><include src=\\"file://{resources}/styles/finnby/styled.css\\"></include></styles><scripts><include src=\\"file://{resources}/scripts/components/styled.js\\"></include></scripts><Panel><Panel class=\\"otherClass _styled_tsx_StyledPanel\\"><Button class=\\"_styled_tsx_StyledButton\\"><Label style=\\"padding-top:12px;\\" class=\\"_styled_tsx_StyledLabel\\"></Label></Button></Panel></Panel></root>"`;
+exports[`rollup should extract classes from styled components 2`] = `"<root><styles><include src=\\"file://{resources}/styles/finnby/styled.css\\"></include></styles><scripts><include src=\\"file://{resources}/scripts/components/styled.js\\"></include></scripts><Panel><Panel class=\\"otherClass _styled_tsx_0_StyledPanel\\"><Button class=\\"_styled_tsx_1_StyledButton\\"><Label style=\\"padding-top:12px;\\" class=\\"_styled_tsx_3_StyledLabel\\"></Label></Button></Panel></Panel></root>"`;
 
 exports[`rollup should extract classes from styled components 3`] = `
-"._styled_tsx_StyledPanel{
+"._styled_tsx_0_StyledPanel{
     background-color: red;
 }
-._styled_tsx_StyledButton{background-color: white;}
-._styled_tsx_StyledLabel{
+._styled_tsx_1_StyledButton{background-color: white;}
+@keyframes _styled_tsx_2_fadeIn{
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+._styled_tsx_3_StyledLabel{
     color: blue;
+    animation: _styled_tsx_2_fadeIn 500ms;
 }"
 `;
 

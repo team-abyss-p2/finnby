@@ -4,7 +4,7 @@ import { sep } from "path";
 import * as React from "react";
 import type { OutputChunk } from "rollup";
 
-import styled, { css } from "./styled";
+import styled, { css, keyframes } from "./styled";
 import * as Components from "../runtime/components";
 import * as Hooks from "../runtime/hooks";
 
@@ -45,6 +45,7 @@ function createSandbox(roots: RootComponent[]) {
                 React,
                 FinnbyRuntime: {
                     css,
+                    keyframes,
                     styled,
                     ...Components,
                     ...Hooks,

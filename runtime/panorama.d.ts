@@ -256,6 +256,11 @@ declare namespace UiToolkitAPI {
     function ProfilingScopeEnd(): number;
     function MakeStringSafe(input: string): string;
     function IsPanoramaInECOMode(): bool;
+    function ShowGlobalCustomLayoutPopupParameters(
+        name: string,
+        layout: string,
+        args: string,
+    ): void;
 
     function ShowGenericPopupYesNo(): any;
     function ShowGenericPopupOkCancel(): any;
@@ -272,7 +277,6 @@ declare namespace UiToolkitAPI {
     function ShowGenericPopupOneOptionBgStyle(): any;
     function ShowGenericPopupThreeOptionsBgStyle(): any;
     function ShowCustomLayoutPopupParameters(): any;
-    function ShowGlobalCustomLayoutPopupParameters(): any;
     function ShowTextTooltip(): any;
     function ShowTextTooltipOnPanel(): any;
     function ShowTextTooltipStyled(): any;
