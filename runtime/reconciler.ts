@@ -308,10 +308,6 @@ const CONFIG: Config = {
     },
     noTimeout: null,
 
-    queueMicrotask(fn) {
-        $.Schedule(0, fn);
-    },
-
     isPrimaryRenderer: true,
 
     appendChild(parentInstance, child) {
