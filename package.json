@@ -1,6 +1,6 @@
 {
     "name": "@team-abyss-p2/finnby",
-    "version": "0.2.0-alpha.5",
+    "version": "0.2.0",
     "description": "A React framework for Source Panorama",
     "main": "dist/runtime.js",
     "types": "dist/index.d.ts",

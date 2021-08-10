@@ -22,6 +22,10 @@ const fadeIn = keyframes`
 const StyledLabel = styled(Label, {})`
     color: blue;
     animation: ${fadeIn} 500ms;
+
+    ${StyledPanel} & {
+        color: white;
+    }
 `;
 
 // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types

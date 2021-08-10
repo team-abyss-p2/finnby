@@ -233,10 +233,14 @@ function tryFoldConstantStyle(
 
     if (isKeyframes) {
         styles.push(`@keyframes ${className}{${stringifyCss(code.value)}}`);
+        // @ts-expect-error missing types
+        binding?.setValue(className);
         return t.stringLiteral(className);
     }
 
     styles.push(`.${className}{${stringifyCss(code.value)}}`);
+    // @ts-expect-error missing types
+    binding?.setValue(`.${className}`);
 
     return t.callExpression(newCallee, [
         t.stringLiteral(className),

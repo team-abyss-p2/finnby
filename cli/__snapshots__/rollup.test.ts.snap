@@ -65,7 +65,10 @@ exports[`rollup should extract classes from styled components 3`] = `
 ._styled_tsx_3_StyledLabel{
     color: blue;
     animation: _styled_tsx_2_fadeIn 500ms;
-}"
+}
+._styled_tsx_0_StyledPanel ._styled_tsx_3_StyledLabel {
+        color: white;
+    }"
 `;
 
 exports[`rollup should process stylesheet imports 1`] = `
