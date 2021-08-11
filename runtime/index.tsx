@@ -8,10 +8,6 @@ import * as Components from "./components";
 import * as Hooks from "./hooks";
 import { Renderer } from "./reconciler";
 
-function noop() {
-    // noop
-}
-
 Object.assign(UiToolkitAPI.GetGlobalObject(), {
     React,
     FinnbyRuntime: {
@@ -25,7 +21,6 @@ Object.assign(UiToolkitAPI.GetGlobalObject(), {
                 React.createElement(Component),
                 Renderer.createContainer(root, 1, true, null),
                 null,
-                noop,
             );
         },
     },

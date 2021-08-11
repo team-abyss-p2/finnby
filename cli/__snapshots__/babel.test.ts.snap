@@ -4,7 +4,9 @@ exports[`styled plugin should deopt on non-static styled component objects 1`] =
 
 exports[`styled plugin should deopt on non-static styled component objects: should deopt on non-static styled component objects 1`] = `
 
-// @ts-expect-error unresolved self import
+/* eslint-disable */
+// @ts-nocheck
+
 import { styled } from "@team-abyss-p2/finnby";
 
 const Component = styled.Panel(
@@ -16,7 +18,8 @@ const Component = styled.Panel(
 
       ↓ ↓ ↓ ↓ ↓ ↓
 
-// @ts-expect-error unresolved self import
+/* eslint-disable */
+// @ts-nocheck
 import { styled } from "@team-abyss-p2/finnby";
 const Component = styled.Panel(
     // @ts-expect-error missing proptype
@@ -32,7 +35,9 @@ exports[`styled plugin should deopt on non-static styled component template stri
 
 exports[`styled plugin should deopt on non-static styled component template strings: should deopt on non-static styled component template strings 1`] = `
 
-// @ts-expect-error unresolved self import
+/* eslint-disable */
+// @ts-nocheck
+
 import { styled } from "@team-abyss-p2/finnby";
 
 const Component = styled.Panel\`
@@ -44,7 +49,8 @@ const Component = styled.Panel\`
 
       ↓ ↓ ↓ ↓ ↓ ↓
 
-// @ts-expect-error unresolved self import
+/* eslint-disable */
+// @ts-nocheck
 import { styled } from "@team-abyss-p2/finnby";
 const Component = styled.Panel\`
     color: \${
@@ -64,7 +70,9 @@ Array [
 
 exports[`styled plugin should generate a class for static styled component objects: should generate a class for static styled component objects 1`] = `
 
-// @ts-expect-error unresolved self import
+/* eslint-disable */
+// @ts-nocheck
+
 import { styled } from "@team-abyss-p2/finnby";
 
 const Component = styled.Panel({
@@ -73,7 +81,8 @@ const Component = styled.Panel({
 
       ↓ ↓ ↓ ↓ ↓ ↓
 
-// @ts-expect-error unresolved self import
+/* eslint-disable */
+// @ts-nocheck
 import { styled } from "@team-abyss-p2/finnby";
 const Component = /*#__PURE__*/ styled.static.Panel("_uid_0_Component");
 
@@ -90,7 +99,9 @@ Array [
 
 exports[`styled plugin should generate a class for static styled component templates: should generate a class for static styled component templates 1`] = `
 
-// @ts-expect-error unresolved self import
+/* eslint-disable */
+// @ts-nocheck
+
 import { styled } from "@team-abyss-p2/finnby";
 
 const Component = styled.Panel\`
@@ -99,9 +110,47 @@ const Component = styled.Panel\`
 
       ↓ ↓ ↓ ↓ ↓ ↓
 
-// @ts-expect-error unresolved self import
+/* eslint-disable */
+// @ts-nocheck
 import { styled } from "@team-abyss-p2/finnby";
 const Component = /*#__PURE__*/ styled.static.Panel("_uid_0_Component");
+
+
+`;
+
+exports[`styled plugin should handle styled components being nested 1`] = `
+Array [
+  ._uid_0_Base{
+    background-color: blue;
+},
+  ._uid_1_Component{@extend ._uid_0_Base;
+    color: red;
+},
+]
+`;
+
+exports[`styled plugin should handle styled components being nested: should handle styled components being nested 1`] = `
+
+/* eslint-disable */
+// @ts-nocheck
+
+import { styled } from "@team-abyss-p2/finnby";
+
+const Base = styled.Panel\`
+    background-color: blue;
+\`;
+
+const Component = styled(Base)\`
+    color: red;
+\`;
+
+      ↓ ↓ ↓ ↓ ↓ ↓
+
+/* eslint-disable */
+// @ts-nocheck
+import { styled } from "@team-abyss-p2/finnby";
+const Base = /*#__PURE__*/ styled.static.Panel("_uid_0_Base");
+const Component = /*#__PURE__*/ styled.static("Panel")("_uid_1_Component");
 
 
 `;
@@ -123,7 +172,9 @@ Array [
 
 exports[`styled plugin should handle styled components being used in selectors: should handle styled components being used in selectors 1`] = `
 
-// @ts-expect-error unresolved self import
+/* eslint-disable */
+// @ts-nocheck
+
 import { styled } from "@team-abyss-p2/finnby";
 
 const ComponentA = styled.Panel\`
@@ -140,7 +191,8 @@ const ComponentB = styled.Panel\`
 
       ↓ ↓ ↓ ↓ ↓ ↓
 
-// @ts-expect-error unresolved self import
+/* eslint-disable */
+// @ts-nocheck
 import { styled } from "@team-abyss-p2/finnby";
 const ComponentA = /*#__PURE__*/ styled.static.Panel("_uid_0_ComponentA");
 const ComponentB = /*#__PURE__*/ styled.static.Panel("_uid_1_ComponentB");
@@ -162,7 +214,9 @@ Array [
 
 exports[`styled plugin should inline css class names in styled components: should inline css class names in styled components 1`] = `
 
-// @ts-expect-error unresolved self import
+/* eslint-disable */
+// @ts-nocheck
+
 import { css, styled } from "@team-abyss-p2/finnby";
 
 const bgBlue = css\`
@@ -176,7 +230,8 @@ const Component = styled.Panel\`
 
       ↓ ↓ ↓ ↓ ↓ ↓
 
-// @ts-expect-error unresolved self import
+/* eslint-disable */
+// @ts-nocheck
 import { styled } from "@team-abyss-p2/finnby";
 const bgBlue = /*#__PURE__*/ "_uid_0_bgBlue";
 const Component = /*#__PURE__*/ styled.static.Panel("_uid_1_Component");
@@ -202,7 +257,9 @@ Array [
 
 exports[`styled plugin should inline keyframe names in styled components: should inline keyframe names in styled components 1`] = `
 
-// @ts-expect-error unresolved self import
+/* eslint-disable */
+// @ts-nocheck
+
 import { keyframes, styled } from "@team-abyss-p2/finnby";
 
 const fadeIn = keyframes\`
@@ -220,7 +277,8 @@ const Component = styled.Panel\`
 
       ↓ ↓ ↓ ↓ ↓ ↓
 
-// @ts-expect-error unresolved self import
+/* eslint-disable */
+// @ts-nocheck
 import { styled } from "@team-abyss-p2/finnby";
 const fadeIn = /*#__PURE__*/ "_uid_0_fadeIn";
 const Component = /*#__PURE__*/ styled.static.Panel("_uid_1_Component");
@@ -238,7 +296,9 @@ Array [
 
 exports[`styled plugin should inline static css: should inline static css 1`] = `
 
-// @ts-expect-error unresolved self import
+/* eslint-disable */
+// @ts-nocheck
+
 import { css } from "@team-abyss-p2/finnby";
 
 const bgBlue = css\`
@@ -247,7 +307,8 @@ const bgBlue = css\`
 
       ↓ ↓ ↓ ↓ ↓ ↓
 
-// @ts-expect-error unresolved self import
+/* eslint-disable */
+// @ts-nocheck
 import "@team-abyss-p2/finnby";
 const bgBlue = /*#__PURE__*/ "_uid_0_bgBlue";
 
@@ -269,7 +330,9 @@ Array [
 
 exports[`styled plugin should inline static keyframes: should inline static keyframes 1`] = `
 
-// @ts-expect-error unresolved self import
+/* eslint-disable */
+// @ts-nocheck
+
 import { keyframes } from "@team-abyss-p2/finnby";
 
 const fadeIn = keyframes\`
@@ -283,7 +346,8 @@ const fadeIn = keyframes\`
 
       ↓ ↓ ↓ ↓ ↓ ↓
 
-// @ts-expect-error unresolved self import
+/* eslint-disable */
+// @ts-nocheck
 import "@team-abyss-p2/finnby";
 const fadeIn = /*#__PURE__*/ "_uid_0_fadeIn";
 

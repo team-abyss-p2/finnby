@@ -1,4 +1,6 @@
-// @ts-expect-error unresolved self import
+/* eslint-disable */
+// @ts-nocheck
+
 import { css, styled } from "@team-abyss-p2/finnby";
 
 const bgBlue = css`

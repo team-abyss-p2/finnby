@@ -76,5 +76,11 @@ pluginTester({
                 expect(styles).toMatchSnapshot();
             },
         },
+        "should handle styled components being nested": {
+            fixture: "__fixtures__/babel/nesting.ts",
+            teardown() {
+                expect(styles).toMatchSnapshot();
+            },
+        },
     },
 });

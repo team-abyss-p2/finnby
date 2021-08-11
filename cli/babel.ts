@@ -176,6 +176,9 @@ function tryFoldConstantStyle(
         }
 
         styledProp = expr.get("property");
+        if (styledProp.isIdentifier() && styledProp.node.name === "static") {
+            return;
+        }
     } else if (expr.isCallExpression()) {
         // styled(Panel)() / styled(Panel)``
         const callee = expr.get("callee");
@@ -210,6 +213,8 @@ function tryFoldConstantStyle(
     }
 
     let newCallee: t.Expression;
+    let styledType: StyledType | undefined;
+
     if (styledProp && state.styledImport) {
         newCallee = t.memberExpression(
             t.memberExpression(
@@ -219,13 +224,28 @@ function tryFoldConstantStyle(
             styledProp.node,
         );
     } else if (styledArgs && state.styledImport) {
-        newCallee = t.callExpression(
-            t.memberExpression(
-                t.identifier(state.styledImport),
-                t.identifier("static"),
-            ),
-            styledArgs.map((arg) => arg.node),
-        );
+        if (styledArgs.length >= 1 && styledArgs[0].isExpression()) {
+            styledType = findStyledType(state, styledArgs[0]);
+        }
+
+        if (styledType) {
+            const [, ...rest] = styledArgs;
+            newCallee = t.callExpression(
+                t.memberExpression(
+                    t.identifier(state.styledImport),
+                    t.identifier("static"),
+                ),
+                [styledType[0], ...rest.map((arg) => arg.node)],
+            );
+        } else {
+            newCallee = t.callExpression(
+                t.memberExpression(
+                    t.identifier(state.styledImport),
+                    t.identifier("static"),
+                ),
+                styledArgs.map((arg) => arg.node),
+            );
+        }
     } else if (isKeyframes && state.keyframesImport) {
         newCallee = t.memberExpression(
             t.identifier(state.keyframesImport),
@@ -255,7 +275,12 @@ function tryFoldConstantStyle(
         return t.stringLiteral(className);
     }
 
-    styles.push(`.${className}{${stringifyCss(code.value)}}`);
+    let cssCode = stringifyCss(code.value);
+    if (styledType && styledType[1]) {
+        cssCode = `@extend .${styledType[1]};${cssCode}`;
+    }
+
+    styles.push(`.${className}{${cssCode}}`);
     // @ts-expect-error missing types
     binding?.setValue(`.${className}`);
 
@@ -267,6 +292,162 @@ function tryFoldConstantStyle(
         t.stringLiteral(className),
         ...additionalArgs,
     ]);
+}
+
+type StyledType = [t.Expression, string | undefined];
+
+function findStyledType(
+    state: StyledState,
+    path: NodePath<t.Expression>,
+): StyledType | undefined {
+    let binding: Binding | undefined;
+    let panelType: t.Expression | undefined;
+
+    if (path.isIdentifier()) {
+        binding = path.scope.getBinding(path.node.name);
+    } else if (path.isCallExpression()) {
+        // match <identifier>.withComponent(<identifier | string>)
+        const callee = path.get("callee");
+        if (!callee.isMemberExpression()) {
+            return;
+        }
+
+        const object = callee.get("object");
+        if (!object.isIdentifier()) {
+            return;
+        }
+
+        const property = callee.get("property");
+        if (
+            !property.isIdentifier() ||
+            property.node.name !== "withComponent"
+        ) {
+            return;
+        }
+
+        const args = path.get("arguments");
+        if (args.length !== 1) {
+            return;
+        }
+
+        if (args[0].isIdentifier()) {
+            const inner = findStyledType(state, args[0]);
+            if (!inner) {
+                return;
+            }
+
+            panelType = inner[0];
+        } else if (args[0].isStringLiteral()) {
+            panelType = args[0].node;
+        } else {
+            return;
+        }
+
+        binding = path.scope.getBinding(object.node.name);
+    }
+
+    if (!binding) {
+        return;
+    }
+
+    if (binding.path.isImportSpecifier()) {
+        const { parentPath } = binding.path;
+        if (!parentPath || !parentPath.isImportDeclaration()) {
+            return;
+        }
+
+        const source = parentPath.get("source");
+        if (source.node.value !== "@team-abyss-p2/finnby") {
+            return;
+        }
+
+        const local = binding.path.get("local");
+        return [local.node, undefined];
+    }
+
+    if (!binding.path.isVariableDeclarator()) {
+        return;
+    }
+
+    const init = binding.path.get("init");
+    if (!init.isCallExpression()) {
+        return;
+    }
+
+    const args = init.get("arguments");
+    if (args.length !== 1) {
+        return;
+    }
+
+    const [className] = args;
+    if (!className.isStringLiteral()) {
+        return;
+    }
+
+    const callee = init.get("callee");
+
+    // recognize expressions matching `styled.static.<identifier>("<className>")`
+    if (callee.isMemberExpression()) {
+        const object = callee.get("object");
+        if (!isStyledStatic(state, object)) {
+            return;
+        }
+
+        const property = callee.get("property");
+        if (!property.isIdentifier()) {
+            return;
+        }
+
+        if (!panelType) {
+            panelType = t.stringLiteral(property.node.name);
+        }
+    }
+
+    // recognize expressions matching `styled.static(<expression>)("<className>")`
+    if (callee.isCallExpression()) {
+        const calleeInner = callee.get("callee");
+        if (!isStyledStatic(state, calleeInner)) {
+            return;
+        }
+
+        const argsInner = callee.get("arguments");
+        if (argsInner.length === 0 || !argsInner[0].isExpression()) {
+            return;
+        }
+
+        const inner = findStyledType(state, argsInner[0]);
+        if (!inner) {
+            return;
+        }
+
+        if (!panelType) {
+            panelType = inner[0];
+        }
+    }
+
+    if (!panelType) {
+        return;
+    }
+
+    return [panelType, className.node.value];
+}
+
+function isStyledStatic(state: StyledState, path: NodePath<any>) {
+    if (!path.isMemberExpression()) {
+        return false;
+    }
+
+    const object = path.get("object");
+    if (!object.isIdentifier() || object.node.name !== state.styledImport) {
+        return false;
+    }
+
+    const property = path.get("property");
+    if (!property.isIdentifier() || property.node.name !== "static") {
+        return false;
+    }
+
+    return true;
 }
 
 function stringifyCss(input: any) {
