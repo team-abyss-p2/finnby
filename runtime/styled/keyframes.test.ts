@@ -1,9 +1,9 @@
-import { css } from "./css";
+import { keyframes } from "./keyframes";
 
-describe("css", () => {
+describe("keyframes", () => {
     it("should throw when called directly", () => {
         const wrapper = () => {
-            css`template`;
+            keyframes`template`;
         };
 
         expect(wrapper).toThrow();
@@ -11,7 +11,7 @@ describe("css", () => {
 
     it("should return a class name when using the internal static method", () => {
         // @ts-expect-error internal API
-        const result = css.static("name");
+        const result = keyframes.static("name");
         expect(result).toBe("name");
     });
 });

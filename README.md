@@ -154,6 +154,3 @@ module.exports = {
 -   Automatically create a `tsconfig.json` file in the project directory like
     create-react-app and next.js do if a `.ts` or `.tsx` file is detected to
     make moving to TypeScript easier
--   The `css` function is sort of useless right now since it's unsupported in
-    the Babel plugin, meaning it cannot be statically extracted nor inlined into
-    other styles

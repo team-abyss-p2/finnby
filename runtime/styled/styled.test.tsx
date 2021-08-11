@@ -1,4 +1,4 @@
-import styled from "./index";
+import { styled } from "./styled";
 import Renderer from "react-test-renderer";
 import { Component, createRef } from "react";
 

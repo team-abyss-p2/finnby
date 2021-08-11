@@ -18,7 +18,7 @@ import {
     Interpolation,
     StylesheetObject,
     StylesheetTemplate,
-} from "./css";
+} from "./interpolation";
 
 import * as Components from "../components";
 

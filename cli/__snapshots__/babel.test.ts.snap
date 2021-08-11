@@ -1,0 +1,291 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`styled plugin should deopt on non-static styled component objects 1`] = `Array []`;
+
+exports[`styled plugin should deopt on non-static styled component objects: should deopt on non-static styled component objects 1`] = `
+
+// @ts-expect-error unresolved self import
+import { styled } from "@team-abyss-p2/finnby";
+
+const Component = styled.Panel(
+    // @ts-expect-error missing proptype
+    (props) => ({
+        backgroundColor: props.bg,
+    }),
+);
+
+      ↓ ↓ ↓ ↓ ↓ ↓
+
+// @ts-expect-error unresolved self import
+import { styled } from "@team-abyss-p2/finnby";
+const Component = styled.Panel(
+    // @ts-expect-error missing proptype
+    (props) => ({
+        backgroundColor: props.bg,
+    }),
+);
+
+
+`;
+
+exports[`styled plugin should deopt on non-static styled component template strings 1`] = `Array []`;
+
+exports[`styled plugin should deopt on non-static styled component template strings: should deopt on non-static styled component template strings 1`] = `
+
+// @ts-expect-error unresolved self import
+import { styled } from "@team-abyss-p2/finnby";
+
+const Component = styled.Panel\`
+    color: \${
+        // @ts-expect-error missing proptype
+        (props) => props.color
+    };
+\`;
+
+      ↓ ↓ ↓ ↓ ↓ ↓
+
+// @ts-expect-error unresolved self import
+import { styled } from "@team-abyss-p2/finnby";
+const Component = styled.Panel\`
+    color: \${
+        // @ts-expect-error missing proptype
+        (props) => props.color
+    };
+\`;
+
+
+`;
+
+exports[`styled plugin should generate a class for static styled component objects 1`] = `
+Array [
+  ._uid_0_Component{background-color: red;},
+]
+`;
+
+exports[`styled plugin should generate a class for static styled component objects: should generate a class for static styled component objects 1`] = `
+
+// @ts-expect-error unresolved self import
+import { styled } from "@team-abyss-p2/finnby";
+
+const Component = styled.Panel({
+    backgroundColor: "red",
+});
+
+      ↓ ↓ ↓ ↓ ↓ ↓
+
+// @ts-expect-error unresolved self import
+import { styled } from "@team-abyss-p2/finnby";
+const Component = /*#__PURE__*/ styled.static.Panel("_uid_0_Component");
+
+
+`;
+
+exports[`styled plugin should generate a class for static styled component templates 1`] = `
+Array [
+  ._uid_0_Component{
+    color: red;
+},
+]
+`;
+
+exports[`styled plugin should generate a class for static styled component templates: should generate a class for static styled component templates 1`] = `
+
+// @ts-expect-error unresolved self import
+import { styled } from "@team-abyss-p2/finnby";
+
+const Component = styled.Panel\`
+    color: red;
+\`;
+
+      ↓ ↓ ↓ ↓ ↓ ↓
+
+// @ts-expect-error unresolved self import
+import { styled } from "@team-abyss-p2/finnby";
+const Component = /*#__PURE__*/ styled.static.Panel("_uid_0_Component");
+
+
+`;
+
+exports[`styled plugin should handle styled components being used in selectors 1`] = `
+Array [
+  ._uid_0_ComponentA{
+    color: red;
+},
+  ._uid_1_ComponentB{
+    color: red;
+
+    ._uid_0_ComponentA {
+        color: blue;
+    }
+},
+]
+`;
+
+exports[`styled plugin should handle styled components being used in selectors: should handle styled components being used in selectors 1`] = `
+
+// @ts-expect-error unresolved self import
+import { styled } from "@team-abyss-p2/finnby";
+
+const ComponentA = styled.Panel\`
+    color: red;
+\`;
+
+const ComponentB = styled.Panel\`
+    color: red;
+
+    \${ComponentA} {
+        color: blue;
+    }
+\`;
+
+      ↓ ↓ ↓ ↓ ↓ ↓
+
+// @ts-expect-error unresolved self import
+import { styled } from "@team-abyss-p2/finnby";
+const ComponentA = /*#__PURE__*/ styled.static.Panel("_uid_0_ComponentA");
+const ComponentB = /*#__PURE__*/ styled.static.Panel("_uid_1_ComponentB");
+
+
+`;
+
+exports[`styled plugin should inline css class names in styled components 1`] = `
+Array [
+  ._uid_0_bgBlue{
+    background-color: blue;
+},
+  ._uid_1_Component{
+    @extend ._uid_0_bgBlue;
+    color: red;
+},
+]
+`;
+
+exports[`styled plugin should inline css class names in styled components: should inline css class names in styled components 1`] = `
+
+// @ts-expect-error unresolved self import
+import { css, styled } from "@team-abyss-p2/finnby";
+
+const bgBlue = css\`
+    background-color: blue;
+\`;
+
+const Component = styled.Panel\`
+    @extend \${bgBlue};
+    color: red;
+\`;
+
+      ↓ ↓ ↓ ↓ ↓ ↓
+
+// @ts-expect-error unresolved self import
+import { styled } from "@team-abyss-p2/finnby";
+const bgBlue = /*#__PURE__*/ "_uid_0_bgBlue";
+const Component = /*#__PURE__*/ styled.static.Panel("_uid_1_Component");
+
+
+`;
+
+exports[`styled plugin should inline keyframe names in styled components 1`] = `
+Array [
+  @keyframes _uid_0_fadeIn{
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+},
+  ._uid_1_Component{
+    animation: _uid_0_fadeIn 500ms;
+},
+]
+`;
+
+exports[`styled plugin should inline keyframe names in styled components: should inline keyframe names in styled components 1`] = `
+
+// @ts-expect-error unresolved self import
+import { keyframes, styled } from "@team-abyss-p2/finnby";
+
+const fadeIn = keyframes\`
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+\`;
+
+const Component = styled.Panel\`
+    animation: \${fadeIn} 500ms;
+\`;
+
+      ↓ ↓ ↓ ↓ ↓ ↓
+
+// @ts-expect-error unresolved self import
+import { styled } from "@team-abyss-p2/finnby";
+const fadeIn = /*#__PURE__*/ "_uid_0_fadeIn";
+const Component = /*#__PURE__*/ styled.static.Panel("_uid_1_Component");
+
+
+`;
+
+exports[`styled plugin should inline static css 1`] = `
+Array [
+  ._uid_0_bgBlue{
+    background-color: blue;
+},
+]
+`;
+
+exports[`styled plugin should inline static css: should inline static css 1`] = `
+
+// @ts-expect-error unresolved self import
+import { css } from "@team-abyss-p2/finnby";
+
+const bgBlue = css\`
+    background-color: blue;
+\`;
+
+      ↓ ↓ ↓ ↓ ↓ ↓
+
+// @ts-expect-error unresolved self import
+import "@team-abyss-p2/finnby";
+const bgBlue = /*#__PURE__*/ "_uid_0_bgBlue";
+
+
+`;
+
+exports[`styled plugin should inline static keyframes 1`] = `
+Array [
+  @keyframes _uid_0_fadeIn{
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+},
+]
+`;
+
+exports[`styled plugin should inline static keyframes: should inline static keyframes 1`] = `
+
+// @ts-expect-error unresolved self import
+import { keyframes } from "@team-abyss-p2/finnby";
+
+const fadeIn = keyframes\`
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+\`;
+
+      ↓ ↓ ↓ ↓ ↓ ↓
+
+// @ts-expect-error unresolved self import
+import "@team-abyss-p2/finnby";
+const fadeIn = /*#__PURE__*/ "_uid_0_fadeIn";
+
+
+`;

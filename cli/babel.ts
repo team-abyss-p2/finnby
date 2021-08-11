@@ -9,23 +9,7 @@ interface StyledConfig {
 interface StyledState extends PluginPass {
     keyframesImport?: string;
     styledImport?: string;
-}
-
-function isAlive(path: NodePath): boolean {
-    if (path.removed) {
-        return false;
-    }
-
-    const { parentPath } = path;
-    if (!parentPath) {
-        return path.isProgram();
-    }
-
-    if (parentPath.node !== path.parent) {
-        return false;
-    }
-
-    return isAlive(parentPath);
+    cssImport?: string;
 }
 
 export function styledPlugin(config: StyledConfig): PluginObj<StyledState> {
@@ -33,21 +17,12 @@ export function styledPlugin(config: StyledConfig): PluginObj<StyledState> {
         visitor: {
             Program: {
                 exit(program, state) {
-                    if (!state.keyframesImport) {
-                        return;
+                    if (state.keyframesImport) {
+                        removeUnusedImport(program, state.keyframesImport);
                     }
 
-                    const binding = program.scope.getBinding(
-                        state.keyframesImport,
-                    );
-
-                    if (!binding) {
-                        return;
-                    }
-
-                    const hasReferences = binding.referencePaths.some(isAlive);
-                    if (!hasReferences) {
-                        binding.path.remove();
+                    if (state.cssImport) {
+                        removeUnusedImport(program, state.cssImport);
                     }
                 },
             },
@@ -74,6 +49,9 @@ export function styledPlugin(config: StyledConfig): PluginObj<StyledState> {
                             continue;
                         case "styled":
                             state.styledImport = local.node.name;
+                            continue;
+                        case "css":
+                            state.cssImport = local.node.name;
                             continue;
                     }
                 }
@@ -132,6 +110,35 @@ export function styledPlugin(config: StyledConfig): PluginObj<StyledState> {
     };
 }
 
+function isAlive(path: NodePath): boolean {
+    if (path.removed) {
+        return false;
+    }
+
+    const { parentPath } = path;
+    if (!parentPath) {
+        return path.isProgram();
+    }
+
+    if (parentPath.node !== path.parent) {
+        return false;
+    }
+
+    return isAlive(parentPath);
+}
+
+function removeUnusedImport(program: NodePath<t.Program>, importName: string) {
+    const binding = program.scope.getBinding(importName);
+    if (!binding) {
+        return;
+    }
+
+    const hasReferences = binding.referencePaths.some(isAlive);
+    if (!hasReferences) {
+        binding.path.remove();
+    }
+}
+
 type Argument =
     | t.Expression
     | t.SpreadElement
@@ -156,6 +163,7 @@ function tryFoldConstantStyle(
     let styledProp: NodePath<t.Expression | t.PrivateName> | undefined;
     let styledArgs: NodePath<Argument>[] | undefined;
     let isKeyframes = false;
+    let isCss = false;
 
     if (expr.isMemberExpression()) {
         // styled.Panel() / styled.Panel``
@@ -184,6 +192,10 @@ function tryFoldConstantStyle(
             // keyframes() / keyframes``
             case state.keyframesImport:
                 isKeyframes = true;
+                break;
+            // css() / css``
+            case state.cssImport:
+                isCss = true;
                 break;
             default:
                 return;
@@ -219,6 +231,11 @@ function tryFoldConstantStyle(
             t.identifier(state.keyframesImport),
             t.identifier("static"),
         );
+    } else if (isCss && state.cssImport) {
+        newCallee = t.memberExpression(
+            t.identifier(state.cssImport),
+            t.identifier("static"),
+        );
     } else {
         return;
     }
@@ -241,6 +258,10 @@ function tryFoldConstantStyle(
     styles.push(`.${className}{${stringifyCss(code.value)}}`);
     // @ts-expect-error missing types
     binding?.setValue(`.${className}`);
+
+    if (isCss) {
+        return t.stringLiteral(className);
+    }
 
     return t.callExpression(newCallee, [
         t.stringLiteral(className),
