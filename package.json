@@ -60,7 +60,7 @@
         "@rollup/plugin-commonjs": "^20.0.0",
         "@rollup/plugin-node-resolve": "^13.0.4",
         "@rollup/plugin-replace": "^3.0.0",
-        "cosmiconfig": "^7.0.0",
+        "cosmiconfig": "^7.0.1",
         "css-to-react-native": "^3.0.0",
         "postcss": "^8.3.6",
         "postcss-advanced-variables": "^3.0.1",
