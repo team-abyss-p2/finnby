@@ -32,7 +32,7 @@
         "@rollup/plugin-json": "^4.1.0",
         "@rollup/plugin-typescript": "^8.2.5",
         "@types/css-to-react-native": "^3.0.0",
-        "@types/jest": "^27.0.1",
+        "@types/jest": "^27.0.3",
         "@types/node": "^16.10.2",
         "@types/react": "^17.0.20",
         "@types/react-dom": "^17.0.9",
