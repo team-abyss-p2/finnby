@@ -45,7 +45,7 @@
         "eslint": "^7.32.0",
         "eslint-config-prettier": "^8.3.0",
         "jest": "^27.2.4",
-        "prettier": "^2.4.0",
+        "prettier": "^2.5.1",
         "react-reconciler": "^0.26.2",
         "react-test-renderer": "^17.0.2",
         "tslib": "^2.3.1",
