@@ -33,7 +33,7 @@
         "@rollup/plugin-typescript": "^8.2.5",
         "@types/css-to-react-native": "^3.0.0",
         "@types/jest": "^27.0.1",
-        "@types/node": "^16.10.2",
+        "@types/node": "^17.0.39",
         "@types/react": "^17.0.20",
         "@types/react-dom": "^17.0.9",
         "@types/react-reconciler": "^0.26.3",
