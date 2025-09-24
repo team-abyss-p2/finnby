@@ -8,18 +8,11 @@ import commonjs from "@rollup/plugin-commonjs";
 
 import postcss from "postcss";
 import modules from "postcss-modules";
-// @ts-expect-error missing types
-import advancedVariables from "postcss-advanced-variables";
-// @ts-expect-error missing types
-import atroot from "postcss-atroot";
-// @ts-expect-error missing types
-import extendRule from "postcss-extend-rule";
-import nested from "postcss-nested";
-import propertyLookup from "postcss-property-lookup";
 
 import { renderChunk } from "./ssr";
 import { Config } from "./config";
 import { styledPlugin } from "./babel";
+import { defaultPostCssPlugins } from "./postcss";
 
 export type RollupConfig = InputOptions & {
     output: OutputOptions;
@@ -28,7 +21,7 @@ export type RollupConfig = InputOptions & {
 export function makeRollupConfig(config: Config, path: string): RollupConfig {
     const extractedStyles: string[] = [];
     const stylesheets = new Set<string>();
-    const uid = "_" + path.replace(/[^a-z0-9]+/g, "_");
+    const uid = `_${path.replace(/[^a-z0-9]+/g, "_")}`;
 
     return config.rollup({
         input: join(config.componentsDir, path),
@@ -46,8 +39,8 @@ export function makeRollupConfig(config: Config, path: string): RollupConfig {
                 exclude: /node_modules/,
 
                 plugins: [
-                    "@babel/plugin-proposal-class-properties",
-                    "@babel/plugin-proposal-nullish-coalescing-operator",
+                    "@babel/plugin-transform-class-properties",
+                    "@babel/plugin-transform-nullish-coalescing-operator",
                     styledPlugin({ uid, styles: extractedStyles }),
                 ],
                 presets: [
@@ -65,7 +58,7 @@ export function makeRollupConfig(config: Config, path: string): RollupConfig {
                         {
                             modules: false,
                             targets: {
-                                node: "8.0.0", // P2CE V8 Version: 5.8.283
+                                node: "17.0.0", // P2CE V8 Version: 9.5.172.19
                             },
                         },
                     ],
@@ -92,11 +85,7 @@ export function makeRollupConfig(config: Config, path: string): RollupConfig {
                                     result = json;
                                 },
                             }),
-                            advancedVariables(),
-                            atroot(),
-                            extendRule(),
-                            nested(),
-                            propertyLookup(),
+                            ...defaultPostCssPlugins(),
                         ]),
                     );
 
@@ -123,13 +112,7 @@ export function makeRollupConfig(config: Config, path: string): RollupConfig {
                         if (file.type === "chunk" && file.isEntry) {
                             if (extractedStyles.length > 0) {
                                 const processor = postcss(
-                                    config.postcss([
-                                        advancedVariables(),
-                                        atroot(),
-                                        extendRule(),
-                                        nested(),
-                                        propertyLookup(),
-                                    ]),
+                                    config.postcss(defaultPostCssPlugins()),
                                 );
 
                                 const code = extractedStyles.join("\n");

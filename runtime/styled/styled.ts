@@ -4,11 +4,11 @@
  */
 
 import {
-    ComponentType,
+    type ComponentType,
     createElement,
-    ElementType,
+    type ElementType as ElemType,
     forwardRef,
-    Ref,
+    type Ref,
 } from "react";
 
 import { flattenStyle } from "./stylesheet";
@@ -41,6 +41,12 @@ function isTemplate<P>(styles: Style<P>): styles is StylesheetTemplate<P> {
 
 type Empty = Record<string, unknown>;
 
+type StyledComponent<P> = ComponentType<P & { as?: string }> & {
+    withComponent: <C = Empty>(component: ElementType<C>) => StyledComponent<C>;
+};
+
+type ElementType<P> = ElemType<P> | StyledComponent<P>;
+
 function isStyled<P>(
     component: ElementType<P>,
 ): component is StyledComponent<P> {
@@ -48,7 +54,7 @@ function isStyled<P>(
         return false;
     }
 
-    return "isStyled" in component && component["isStyled"] === true;
+    return "isStyled" in component && component.isStyled === true;
 }
 
 function createStyled<C = Empty>(
@@ -70,10 +76,12 @@ function createStyled<C = Empty>(
 
         type ExtractRef<T> = T extends { ref?: Ref<infer R> } ? R : never;
         const Styled = forwardRef<ExtractRef<C & P>, C & P>(
+            // biome-ignore lint/suspicious/noExplicitAny: this code doesn't typecheck without any
             (props: any, ref) => {
                 const finalTag =
                     shouldUseAs && "as" in props ? props.as : component;
 
+                // biome-ignore lint/suspicious/noExplicitAny: this code doesn't typecheck without any
                 const newProps: any = {};
 
                 for (const key in props) {
@@ -116,10 +124,12 @@ function createStatic<C = Empty>(
 
     return function createStaticStyledComponent(className: string) {
         type ExtractRef<T> = T extends { ref?: Ref<infer R> } ? R : never;
+        // biome-ignore lint/suspicious/noExplicitAny: this code doesn't typecheck without any
         const Styled = forwardRef<ExtractRef<C>, C>((props: any, ref) => {
             const finalTag =
                 shouldUseAs && "as" in props ? props.as : component;
 
+            // biome-ignore lint/suspicious/noExplicitAny: this code doesn't typecheck without any
             const newProps: any = {};
 
             for (const key in props) {
@@ -150,6 +160,7 @@ function createStatic<C = Empty>(
 }
 
 const styledStatic = Object.entries(Components).reduce(
+    // biome-ignore lint/suspicious/noExplicitAny: this code doesn't typecheck without any
     (styledStatic: any, [name, component]) =>
         Object.defineProperty(styledStatic, name, {
             enumerable: true,
@@ -158,10 +169,6 @@ const styledStatic = Object.entries(Components).reduce(
         }),
     createStatic,
 );
-
-type StyledComponent<P> = ComponentType<P & { as?: string }> & {
-    withComponent: <C = Empty>(component: ElementType<C>) => StyledComponent<C>;
-};
 
 type StyledFactory<C> = <P = Empty>(
     ...styles: Style<P>
@@ -173,6 +180,7 @@ type StyledBinds = {
 
 type Styled = typeof createStyled & StyledBinds;
 export const styled: Styled = Object.entries(Components).reduce(
+    // biome-ignore lint/suspicious/noExplicitAny: this code doesn't typecheck without any
     (styled: any, [name, component]) =>
         Object.defineProperty(styled, name, {
             enumerable: true,

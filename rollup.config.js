@@ -29,17 +29,17 @@ const RUNTIME_CONFIG = {
             resolveJsonModule: true,
         }),
         // Run Babel on the output to ensure compatibility with the V8
-        // version embedded in P2CE (5.8.283 on 04/03/2021)
+        // version embedded in P2CE (9.5.172.19 on 11/12/2021)
         getBabelOutputPlugin({
             allowAllFormats: true,
-            plugins: ["@babel/plugin-proposal-nullish-coalescing-operator"],
+            plugins: ["@babel/plugin-transform-nullish-coalescing-operator"],
             presets: [
                 [
                     "@babel/preset-env",
                     {
                         modules: false,
                         targets: {
-                            node: "8.0.0",
+                            node: "17.0.0",
                         },
                     },
                 ],
@@ -52,7 +52,7 @@ const RUNTIME_CONFIG = {
         entryFileNames: "runtime.js",
         // The polyfill is included as a banner so that it sits in the global
         // scope, outside of the Rollup-inserted IIFE
-        banner: () => fs.readFile(join(__dirname, "runtime/polyfills.js")),
+        banner: () => fs.readFile(join(__dirname, "runtime/banner.js")),
         format: "iife",
     },
 };
@@ -123,6 +123,8 @@ const CLI_CONFIG = {
         "react",
         "react/jsx-runtime",
         "react-dom/server",
+        "react-devtools-core",
+        "react-refresh/runtime",
     ],
 
     output: {

@@ -197,10 +197,46 @@ declare namespace panorama {
 
 declare const $: typeof panorama;
 
+declare namespace FriendsAPI {}
+
 declare namespace GameInterfaceAPI {
-    function GetSettingString(settingName: string): string;
-    function SetSettingString(settingName: string, value: string): void;
     function ConsoleCommand(command: string): void;
+
+    function GetSettingString(settingName: string): string;
+    function GetSettingInt(settingName: string): number;
+    function GetSettingFloat(settingName: string): number;
+    function GetSettingBool(settingName: string): boolean;
+    function GetSettingColor(settingName: string): any;
+
+    function SetSettingString(settingName: string, value: string): void;
+    function SetSettingInt(settingName: string, value: number): void;
+    function SetSettingFloat(settingName: string, value: number): void;
+    function SetSettingBool(settingName: string, value: boolean): void;
+    function SetSettingColor(settingName: string, value: any): void;
+
+    function RegisterGameEventHandler(
+        eventName: string,
+        callback: (...any: any[]) => void,
+    ): number;
+    function UnregisterGameEventHandler(callbackId: number): void;
+}
+
+declare namespace OptionsMenuAPI {
+    function RestoreKeybdMouseBindingDefaults(): void;
+    function ShowSteamControllerBindingsPanel(): void;
+}
+
+declare namespace RichPresenceAPI {
+    function Clear(): void;
+    function UpdateRichPresenceState(state: any): void;
+}
+
+declare namespace StaticHudMenuAPI {}
+
+declare namespace SteamOverlayAPI {
+    function OpenURL(url: string): void;
+    function OpenURLModal(url: string): void;
+    function OpenToProfileID(profileID: string): void;
 }
 
 declare namespace UiToolkitAPI {
@@ -299,3 +335,11 @@ declare namespace UiToolkitAPI {
     function ShowCustomLayoutContextMenuParameters(): any;
     function ShowCustomLayoutContextMenuParametersDismissEvent(): any;
 }
+
+declare namespace UserAPI {
+    function GetXUID(): number;
+}
+
+declare const __REACT_DEVTOOLS_GLOBAL_HOOK__: any;
+
+declare const __finnby_ssr: undefined | true;

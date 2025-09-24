@@ -1,18 +1,5 @@
 import { useEffect } from "react";
 
-export function useUnhandledEvent(
-    name: string,
-    handler: (...args: any[]) => void,
-    deps: any[],
-): void {
-    useEffect(() => {
-        $.RegisterForUnhandledEvent(name, handler);
-        return () => {
-            $.UnregisterForUnhandledEvent(name, handler);
-        };
-    }, deps);
-}
-
 export function usePanelEvent(
     name: string,
     panel: Panel,

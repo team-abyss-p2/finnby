@@ -1,7 +1,7 @@
-import Reconciler from "react-reconciler";
+import Reconciler, { Fiber } from "react-reconciler";
 
 type Type = string;
-type Props = Record<string, any>;
+export type Props = Record<string, any>;
 type Container = Panel;
 type Instance = Panel;
 type TextInstance = never;
@@ -11,8 +11,8 @@ type PublicInstance = Panel;
 type HostContext = unknown;
 type UpdatePayload = [string, any][];
 type ChildSet = never;
-type TimeoutHandle = () => void;
-type NoTimeout = null;
+type TimeoutHandle = number;
+type NoTimeout = -1;
 
 type Config = Reconciler.HostConfig<
     Type,
@@ -83,7 +83,9 @@ function applyPropList(instance: Instance, props: UpdatePayload) {
                     $.UnregisterEventHandler(event, instance, func);
                 }
             } else {
-                $.Msg("Invalid value for event " + event + ": " + typeof value);
+                console.error(
+                    `Invalid value for event ${event}: ${typeof value}`,
+                );
             }
             continue;
         }
@@ -183,7 +185,7 @@ function computeDiff(oldProps: PrevProps, newProps: Props): UpdatePayload {
 
         if (prevValue !== value) {
             if (key === "id") {
-                $.Msg("Changing a panel's id is not supported");
+                console.error("Changing a panel's id is not supported");
                 continue;
             }
 
@@ -232,22 +234,69 @@ let uniqueId = 0;
 // Those panels are treated as conceptual shadow roots,
 // hydration behaves as if they have no children
 const BLOCK_HYDRATION = [
+    "ColorPicker",
+    "GlobalPopups",
+    "IntroMovie",
+    "HudAutoDisconnect",
+    "HudChat",
+    "HudDamageIndicator",
+    "HudDeathNotice",
+    "HudDemoPlayback",
+    "HudHealthArmor",
+    "HudHintText",
+    "HudRadio",
+    "CSGOHudSpecPlayer",
+    "CSGOHudSpectator",
+    "HudStaticMenu",
+    "HudVote",
+    "PerfTestsCppItem",
+    "PerfTestsCpp",
+    "PanelTest1",
+    "PanelTest2",
+    "SettingsEnum",
+    "SettingsEnumDropDown",
+    "SettingsKeyBinder",
+    "SettingsSlider",
+    "SettingsToggle",
+    "ColorDisplay",
+    "DebugTextTooltip",
+    "DebugLayout",
     "ProgressBar",
-    "ChaosPopupManager",
+    "CircularProgressBar",
+    "Slider",
+    "ToggleButton",
+    "RadioButton",
+    "DelayLoadList",
+    "DragZoom",
+    "DropDown",
+    "Label",
+    "ScrollBar",
+    "TextEntryIMEControls",
+    "DebugLayout",
+    "DebugPanelComputed",
+    "PopupManager",
     "ContextMenuManager",
-    "ChaosTooltipManager",
+    "TooltipManager",
 ];
+
+type OpaqueHandle = Fiber;
+
+const FIBER_CACHE = new Map<Panel, OpaqueHandle>();
+const PROPS_CACHE = new Map<Panel, Props>();
 
 const CONFIG: Config = {
     supportsMutation: true,
     supportsPersistence: false,
 
-    createInstance(type, props) {
+    createInstance(type, props, rootContainer, hostContext, internalHandle) {
         const instance = $.CreatePanel(
             type,
             $.GetContextPanel(),
             (typeof props === "object" && props.id) || `react-${uniqueId++}`,
         );
+
+        FIBER_CACHE.set(instance, internalHandle);
+        PROPS_CACHE.set(instance, props);
 
         applyPropList(instance, Object.entries(props));
         return instance;
@@ -299,14 +348,9 @@ const CONFIG: Config = {
     },
 
     now: Date.now,
-    scheduleTimeout(fn, delay) {
-        $.Schedule(delay ?? 0, fn);
-        return fn;
-    },
-    cancelTimeout(fn) {
-        $.CancelScheduled(fn);
-    },
-    noTimeout: null,
+    scheduleTimeout: setTimeout,
+    cancelTimeout: clearTimeout,
+    noTimeout: -1,
 
     isPrimaryRenderer: true,
 
@@ -349,11 +393,12 @@ const CONFIG: Config = {
         // noop
     },
 
-    commitUpdate(instance, updatePayload) {
+    commitUpdate(instance, updatePayload, type, prevPros, nextProps) {
         if (Array.isArray(updatePayload)) {
+            PROPS_CACHE.set(instance, nextProps);
             applyPropList(instance, updatePayload);
         } else {
-            $.Msg("Unexpected " + typeof updatePayload + " in commitUpdate");
+            console.error(`Unexpected ${typeof updatePayload} in commitUpdate`);
         }
     },
 
@@ -415,9 +460,9 @@ const CONFIG: Config = {
         const index = parent.GetChildIndex(instance);
         if (index < parent.GetChildCount() - 1) {
             return parent.GetChild(index + 1);
-        } else {
-            return null;
         }
+
+        return null;
     },
 
     getFirstHydratableChild(parentInstance) {
@@ -456,7 +501,7 @@ const CONFIG: Config = {
     },
 
     commitHydratedContainer() {
-        // noop
+        // console.log("commitHydratedContainer");
     },
 
     commitHydratedSuspenseInstance() {
@@ -464,44 +509,60 @@ const CONFIG: Config = {
     },
 
     didNotMatchHydratedContainerTextInstance() {
-        $.Msg("didNotMatchHydratedContainerTextInstance");
+        console.error("didNotMatchHydratedContainerTextInstance");
     },
 
     didNotMatchHydratedTextInstance() {
-        $.Msg("didNotMatchHydratedTextInstance");
+        console.error("didNotMatchHydratedTextInstance");
     },
 
     didNotHydrateContainerInstance() {
-        $.Msg("didNotHydrateContainerInstance");
+        console.error("didNotHydrateContainerInstance");
     },
 
     didNotHydrateInstance(parentType, parentProps, parentInstance, instance) {
-        $.Msg("Unexpected " + instance.paneltype + " in " + parentType);
+        console.error(`Unexpected ${instance.paneltype} in ${parentType}`);
     },
 
     didNotFindHydratableContainerInstance() {
-        $.Msg("didNotFindHydratableContainerInstance");
+        console.error("didNotFindHydratableContainerInstance");
     },
 
     didNotFindHydratableContainerTextInstance() {
-        $.Msg("didNotFindHydratableContainerTextInstance");
+        console.error("didNotFindHydratableContainerTextInstance");
     },
 
     didNotFindHydratableContainerSuspenseInstance() {
-        $.Msg("didNotFindHydratableContainerSuspenseInstance");
+        console.error("didNotFindHydratableContainerSuspenseInstance");
     },
 
     didNotFindHydratableInstance() {
-        $.Msg("didNotFindHydratableInstance");
+        console.error("didNotFindHydratableInstance");
     },
 
     didNotFindHydratableTextInstance() {
-        $.Msg("didNotFindHydratableTextInstance");
+        console.error("didNotFindHydratableTextInstance");
     },
 
     didNotFindHydratableSuspenseInstance() {
-        $.Msg("didNotFindHydratableSuspenseInstance");
+        console.error("didNotFindHydratableSuspenseInstance");
     },
 };
 
 export const Renderer = Reconciler(CONFIG);
+
+export function lookupNodeProps(instance: Instance): Props | undefined {
+    return PROPS_CACHE.get(instance);
+}
+
+Renderer.injectIntoDevTools({
+    // Always a production bundle
+    bundleType: (process.env.NODE_ENV === 'production') ? 0 : 1,
+    // Must be set to the same version as react to
+    // enabled the correct features in the devtools
+    version: "17.0.1",
+    rendererPackageName: "finnby",
+    findFiberByHostInstance(node) {
+        return FIBER_CACHE.get(node) ?? null;
+    },
+});

@@ -32,11 +32,13 @@ function createSandbox(roots: RootComponent[]) {
 
     const CONTEXT_PANEL = Symbol("contextPanel");
     panorama["GetContextPanel"] = () => CONTEXT_PANEL;
-    panorama["Msg"] = () => {
-        // noop
+    panorama["Msg"] = (...args: any[]) => {
+        console.log(...args);
     };
 
     return {
+        __finnby_ssr: true,
+
         panorama,
         $: panorama,
 
@@ -56,13 +58,6 @@ function createSandbox(roots: RootComponent[]) {
             }),
         },
     };
-}
-
-function renderElement(elem: React.ReactElement) {
-    // ugh
-    return server
-        .renderToStaticMarkup(elem)
-        .replace(/style="([^"]+)"/g, `style="$1;"`);
 }
 
 const SEPARATOR = new RegExp(sep.replace("\\", "\\\\"), "g");
@@ -110,7 +105,7 @@ export function renderChunk(
         scripts.push(...Component.scripts.map(normalize));
     }
 
-    return renderElement(
+    return server.renderToStaticMarkup(
         <root>
             {styles.length > 0 && (
                 <styles>
